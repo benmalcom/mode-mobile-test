@@ -3,8 +3,8 @@ import type React from 'react';
 
 export const WalletConnector: React.FC = () => {
   return (
-    <Flex w="full" h="400px">
-      <Flex w="full" flexDir="column" gap={3} align="center" pb={8}>
+    <Flex w="full" h="full" bg="purple.50" align="center" justify="center">
+      <Flex flexDir="column" gap={3} align="center" pb={8} h="400px" w="644px">
         <Heading as="h3" size="xl">
           Web3 Task Manager
         </Heading>

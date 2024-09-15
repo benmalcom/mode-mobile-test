@@ -12,7 +12,7 @@ const NavBar: React.FC<NavBarProps> = () => {
   return (
     <Box
       as="nav"
-      bg="purple.50"
+      bg="gray.50"
       boxShadow="sm"
       w="full"
       position="fixed"
