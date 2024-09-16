@@ -1,41 +1,56 @@
-// components/AuthContext.tsx
-import { WalletConnectConnector } from '@walletconnect/web3-provider';
-import { createContext, useContext, useState, useEffect } from 'react';
-import { useAccount, useConnect } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
+import { useMemo, createContext, useContext } from 'react';
+import { useAccount, useConnect, useDisconnect, WagmiProvider } from 'wagmi';
 
-const AuthContext = createContext<{
-  address: string | null;
+import { config } from '~/lib/web3/wagmiConfig';
+
+interface Web3AuthContextType {
+  connect: (connector: never) => void;
+  disconnect: () => void;
   isConnected: boolean;
-  connectWallet: () => void;
-}>({
-  address: null,
-  isConnected: false,
-  connectWallet: () => {},
-});
+  address: string | undefined;
+  error: Error | null;
+}
 
-const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { connect } = useConnect();
-  const { isConnected, address } = useAccount();
+const Web3AuthContext = createContext<Web3AuthContextType | undefined>(
+  undefined
+);
 
-  const connectWallet = async () => {
-    connect({
-      connector: new WalletConnectConnector({
-        rpc: {
-          [polygonAmoyNetwork.chainId]: polygonAmoyNetwork.rpcUrls[0],
-        },
-      }),
-    });
-  };
+const queryClient = new QueryClient();
 
-  useEffect(() => {
-    // Handle address changes or connection status changes
-  }, [address, isConnected]);
+export function Web3AuthProvider({ children }: { children: ReactNode }) {
+  const { address, isConnected } = useAccount();
+  const { connect, connectors, error } = useConnect();
+  const { disconnect } = useDisconnect();
+
+  const value = useMemo(
+    () => ({
+      connect: (connector: never) => connect({ connector }),
+      disconnect,
+      isConnected,
+      address,
+      error,
+      connectors,
+    }),
+    [address, connect, connectors, disconnect, error, isConnected]
+  );
 
   return (
-    <AuthContext.Provider value={{ address, isConnected, connectWallet }}>
-      {children}
-    </AuthContext.Provider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <Web3AuthContext.Provider value={value}>
+          {children}
+        </Web3AuthContext.Provider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
-};
+}
 
-export { AuthContext, AuthProvider };
+export function useWeb3Auth() {
+  const context = useContext(Web3AuthContext);
+  if (context === undefined) {
+    throw new Error('useWeb3Auth must be used within a Web3AuthProvider');
+  }
+  return context;
+}
