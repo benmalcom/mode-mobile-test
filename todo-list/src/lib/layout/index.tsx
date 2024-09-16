@@ -11,9 +11,17 @@ type LayoutProps = {
 
 export const Layout = ({ children }: LayoutProps) => {
   return (
-    <Flex flexDir="column" w="100vw" h="100vh" transition="0.5s ease-out">
+    <Flex
+      flexDir="column"
+      w="100vw"
+      h="100vh"
+      transition="0.5s ease-out"
+      bg="gray.50"
+    >
       <NavBar />
-      <Box flex={1}>{children}</Box>
+      <Box flex={1} w="1180px" mx="auto" mt={28}>
+        {children}
+      </Box>
     </Flex>
   );
 };

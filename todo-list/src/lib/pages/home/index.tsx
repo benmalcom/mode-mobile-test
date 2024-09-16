@@ -2,8 +2,9 @@
 
 import { Flex } from '@chakra-ui/react';
 
-import { WalletConnector } from '~/lib/pages/home/login/wallet-connector';
+import { TodoModule } from '~/lib/pages/home/todo-module';
+import { WalletConnector } from '~/lib/pages/home/wallet-connector';
 
 export const Home = () => {
-  return <WalletConnector />;
+  return <TodoModule />;
 };

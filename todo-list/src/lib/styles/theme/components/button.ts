@@ -5,6 +5,7 @@ export const Button: ComponentStyleConfig = {
     custom: {
       bg: 'black',
       color: 'white',
+      border: 'none',
       _hover: {
         bg: 'gray.700', // Darker shade on hover
       },
