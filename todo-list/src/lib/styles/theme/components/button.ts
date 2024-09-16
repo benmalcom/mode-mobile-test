@@ -12,9 +12,7 @@ export const Button: ComponentStyleConfig = {
       _active: {
         bg: 'gray.800', // Even darker shade when active
       },
-      _focus: {
-        boxShadow: '0 0 0 3px rgba(66, 153, 225, 0.6)', // Optional focus ring
-      },
+      _focus: {},
     },
   },
 };
