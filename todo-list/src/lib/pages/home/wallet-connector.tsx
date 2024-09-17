@@ -1,9 +1,14 @@
 import { Flex, Button, Heading, Text, Image } from '@chakra-ui/react';
 import type React from 'react';
 
-export const WalletConnector: React.FC = () => {
+type WalletConnectorProps = {
+  onClick(): void;
+};
+export const WalletConnector: React.FC<WalletConnectorProps> = ({
+  onClick,
+}) => {
   return (
-    <Flex w="full" h="full" bg="purple.50" align="center" justify="center">
+    <Flex w="full" h="full" align="center" justify="center">
       <Flex flexDir="column" gap={3} align="center" pb={8} h="400px" w="644px">
         <Heading as="h3" size="xl">
           Web3 Task Manager
@@ -15,7 +20,7 @@ export const WalletConnector: React.FC = () => {
         <Button
           mt={4}
           leftIcon={<Image src="/SVG_MetaMask_Icon_Color.svg" h="25px" />}
-          onClick={undefined}
+          onClick={onClick}
           colorScheme="purple"
         >
           Connect Metamask

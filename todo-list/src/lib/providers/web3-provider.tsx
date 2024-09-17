@@ -1,23 +1,20 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { useMemo, createContext, useContext } from 'react';
-import { useAccount, useConnect, useDisconnect, WagmiProvider } from 'wagmi';
-
-import { config } from '~/lib/web3/wagmiConfig';
+import type { Connector } from 'wagmi';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
 
 interface Web3AuthContextType {
-  connect: (connector: never) => void;
+  connect: (connector: Connector) => void;
   disconnect: () => void;
   isConnected: boolean;
   address: string | undefined;
   error: Error | null;
+  connectors: readonly Connector[];
 }
 
 const Web3AuthContext = createContext<Web3AuthContextType | undefined>(
   undefined
 );
-
-const queryClient = new QueryClient();
 
 export function Web3AuthProvider({ children }: { children: ReactNode }) {
   const { address, isConnected } = useAccount();
@@ -26,7 +23,7 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
-      connect: (connector: never) => connect({ connector }),
+      connect: (connector: Connector) => connect({ connector }),
       disconnect,
       isConnected,
       address,
@@ -37,13 +34,9 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <Web3AuthContext.Provider value={value}>
-          {children}
-        </Web3AuthContext.Provider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <Web3AuthContext.Provider value={value}>
+      {children}
+    </Web3AuthContext.Provider>
   );
 }
 

@@ -3,7 +3,7 @@ import { http, createConfig } from 'wagmi';
 import { mainnet } from 'wagmi/chains';
 import { injected, metaMask, walletConnect } from 'wagmi/connectors';
 
-const projectId = 'YOUR_WALLET_CONNECT_PROJECT_ID';
+const projectId = '457751f94c56c29d849a484620dcb62c';
 const polygonRPCUrl = 'https://rpc-amoy.polygon.technology';
 
 // Define Polygon Amoy Testnet

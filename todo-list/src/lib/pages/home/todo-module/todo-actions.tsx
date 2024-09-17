@@ -8,6 +8,14 @@ import {
 } from '@chakra-ui/react';
 import type React from 'react';
 
+import { ModalManager } from '~/lib/pages/home/todo-module/todo-modal-manager';
+
+const triggerButton = ({ trigger }: { trigger(): void }) => (
+  <Button size="sm" colorScheme="purple" rounded="2xl" onClick={trigger}>
+    New Task
+  </Button>
+);
+
 type TodoActionsProps = {};
 export const TodoActions: React.FC<TodoActionsProps> = () => {
   return (
@@ -25,9 +33,7 @@ export const TodoActions: React.FC<TodoActionsProps> = () => {
         </InputLeftElement>
         <Input type="search" placeholder="Search" rounded="2xl" />
       </InputGroup>
-      <Button size="sm" colorScheme="purple" rounded="2xl">
-        New Task
-      </Button>
+      <ModalManager onSave={() => {}} triggerFunc={triggerButton} />
     </Flex>
   );
 };
