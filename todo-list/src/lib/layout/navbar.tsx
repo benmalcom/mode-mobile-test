@@ -5,12 +5,11 @@ import { AiOutlinePoweroff } from 'react-icons/ai';
 import { Logo } from '~/lib/components/logo';
 import { useWeb3Auth } from '~/lib/providers/web3-provider';
 
-type NavBarProps = {};
-
-const NavBar: React.FC<NavBarProps> = () => {
-  const { disconnect, isConnected } = useWeb3Auth();
+const NavBar: React.FC = () => {
+  const { disconnect, isConnected, clearError } = useWeb3Auth();
   const handleLogOut = async () => {
     disconnect();
+    clearError();
   };
 
   return (

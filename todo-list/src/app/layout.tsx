@@ -12,7 +12,7 @@ const APP_NAME = 'todo-list';
 
 export const metadata: Metadata = {
   title: { default: APP_NAME, template: `%s | ${APP_NAME}` },
-  description: 'Todo List for mode mobile',
+  description: 'Web3 Todo List',
   applicationName: APP_NAME,
   appleWebApp: {
     capable: true,
@@ -32,8 +32,8 @@ export const viewport: Viewport = {
 
 const RootLayout = ({ children }: RootLayoutProps) => {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <RootProviders>
           <Layout>{children}</Layout>
         </RootProviders>

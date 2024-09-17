@@ -14,7 +14,6 @@ import {
   FormLabel,
   Input,
   FormErrorMessage,
-  Flex,
   Textarea,
 } from '@chakra-ui/react';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -99,7 +98,9 @@ const TodoModal: React.FC<TodoModalProps> = ({
         backdropFilter="blur(10px) hue-rotate(90deg)"
       />
       <ModalContent>
-        <ModalHeader>Add Todo</ModalHeader>
+        <ModalHeader>
+          {initialValues?.id ? 'Edit Todo' : 'Add Todo'}
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <form onSubmit={handleSubmit(onSubmit)}>

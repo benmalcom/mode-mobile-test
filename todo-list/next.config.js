@@ -17,6 +17,8 @@ module.exports = withPWA({
       test: /\.svg$/, // Add a rule to handle SVG imports
       use: ['@svgr/webpack'], // Use @svgr/webpack to transform SVGs into React components
     });
+    config.externals.push('pino-pretty', 'encoding');
+    config.resolve.fallback = { fs: false, net: false, tls: false };
 
     return config;
   },
