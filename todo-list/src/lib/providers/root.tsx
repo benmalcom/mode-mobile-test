@@ -7,7 +7,7 @@ import { WagmiProvider } from 'wagmi';
 
 import { ChakraProvider } from '~/lib/providers/chakra-provider';
 import { Web3AuthProvider } from '~/lib/providers/web3-provider';
-import { config } from '~/lib/web3/wagmiConfig';
+import { config } from '~/lib/utils/wagmi-config';
 
 const queryClient = new QueryClient();
 
