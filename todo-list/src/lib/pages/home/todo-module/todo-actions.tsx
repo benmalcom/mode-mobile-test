@@ -26,12 +26,19 @@ export const TodoActions: React.FC<TodoActionsProps> = () => {
       boxShadow="md"
       p={3}
       w="full"
+      border="1px solid"
+      borderColor="purple.200"
     >
       <InputGroup w="250px">
         <InputLeftElement pointerEvents="none">
           <SearchIcon color="gray.300" />
         </InputLeftElement>
-        <Input type="search" placeholder="Search" rounded="2xl" />
+        <Input
+          type="search"
+          placeholder="Search"
+          rounded="2xl"
+          colorScheme="purple"
+        />
       </InputGroup>
       <ModalManager onSave={() => {}} triggerFunc={triggerButton} />
     </Flex>
