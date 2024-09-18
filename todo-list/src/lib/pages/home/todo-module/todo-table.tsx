@@ -10,16 +10,31 @@ import {
   Tbody,
   Td,
   Tfoot,
+  Badge,
 } from '@chakra-ui/react';
 import type React from 'react';
 
-import type { Todo } from '~/lib/types/todo';
+import type { Todo, TodoPriority } from '~/lib/types/todo';
+import { TODO_PRIORITIES } from '~/lib/utils/constants';
+
+const PRIORITY_BADGE_MAP: { [key in TodoPriority]: string } = {
+  low: 'blackAlpha',
+  medium: 'orange',
+  high: 'red',
+};
+
+const fetchPriorityLabel = (priority: TodoPriority) =>
+  TODO_PRIORITIES.find((item) => item.value === priority)?.label;
 
 type TableProps = {
   todos: Todo[];
   loading?: boolean;
+  isUpdating: Set<string>;
+  isDeleting: Set<string>;
+  onUpdate(todoId: string, updatedTodo: Todo): void;
+  onDelete(todoId: string): void;
 };
-export const TodoTable: React.FC<TableProps> = () => {
+export const TodoTable: React.FC<TableProps> = ({ todos }) => {
   return (
     <TableContainer bg="white" boxShadow="md">
       <Table size="md">
@@ -33,27 +48,33 @@ export const TodoTable: React.FC<TableProps> = () => {
           </Tr>
         </Thead>
         <Tbody>
-          <Tr>
-            <Td>inches</Td>
-            <Td>millimetres (mm)</Td>
-            <Td>millimetres (mm)</Td>
-            <Td>millimetres (mm)</Td>
-            <Td>25.4</Td>
-          </Tr>
-          <Tr>
-            <Td>feet</Td>
-            <Td>centimetres (cm)</Td>
-            <Td>centimetres (cm)</Td>
-            <Td>centimetres (cm)</Td>
-            <Td>30.48</Td>
-          </Tr>
-          <Tr>
-            <Td>yards</Td>
-            <Td>metres (m)</Td>
-            <Td>metres (m)</Td>
-            <Td>metres (m)</Td>
-            <Td>0.91444</Td>
-          </Tr>
+          {todos.map((todo) => (
+            <Tr key={todo.id}>
+              <Td>{todo.title}</Td>
+              <Td>
+                <Badge colorScheme={PRIORITY_BADGE_MAP[todo.priority]}>
+                  {fetchPriorityLabel(todo.priority)}
+                </Badge>
+              </Td>
+              <Td>{new Date(todo.dueDate).toISOString()}</Td>
+              <Td>
+                {todo.completed ? (
+                  <Badge
+                    variant="subtle"
+                    colorScheme="green"
+                    textTransform="capitalize"
+                  >
+                    Completed
+                  </Badge>
+                ) : (
+                  <Badge variant="subtle" textTransform="capitalize">
+                    Not Completed
+                  </Badge>
+                )}
+              </Td>
+              <Td>-</Td>
+            </Tr>
+          ))}
         </Tbody>
 
         <Tfoot>

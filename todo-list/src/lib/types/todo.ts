@@ -8,3 +8,10 @@ export type Todo = {
   priority: TodoPriority;
   completed?: boolean;
 };
+
+export type TodoRecord = {
+  data: Todo[];
+  page: number;
+  limit: number;
+  total: number;
+};

@@ -24,18 +24,14 @@ import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import type { Todo, TodoPriority } from '~/lib/types/todo';
-
-const PRIORITIES = [
-  { label: 'Low', value: 'low' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'High', value: 'high' },
-];
+import { TODO_PRIORITIES } from '~/lib/utils/constants';
 
 type TodoModalProps = {
-  onSave(values: Omit<Todo, 'id'>): void;
+  onSave(values: Omit<Todo, 'id'>, callback?: () => void): void;
   initialValues?: Partial<Todo>;
   isOpen: boolean;
   onClose(): void;
+  loading?: boolean;
 };
 
 type TodoFormValues = {
@@ -52,7 +48,7 @@ const schema = yup
     priority: yup
       .mixed()
       .oneOf(
-        PRIORITIES.map((item) => item.value),
+        TODO_PRIORITIES.map((item) => item.value),
         'Invalid priority'
       )
       .required('Priority is required'),
@@ -68,6 +64,7 @@ const TodoModal: React.FC<TodoModalProps> = ({
   onSave,
   isOpen,
   onClose,
+  loading,
 }) => {
   const {
     register,
@@ -88,8 +85,7 @@ const TodoModal: React.FC<TodoModalProps> = ({
   const formValues = watch();
 
   const onSubmit: SubmitHandler<TodoFormValues> = (values) => {
-    onSave(values);
-    onClose();
+    onSave(values, onClose);
   };
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -147,7 +143,7 @@ const TodoModal: React.FC<TodoModalProps> = ({
                   <FormControl isInvalid={Boolean(errors.priority)}>
                     <FormLabel htmlFor="priority">Priority</FormLabel>
                     <Stack direction="row" spacing={1} align="center">
-                      {PRIORITIES.map((item, index) => (
+                      {TODO_PRIORITIES.map((item, index) => (
                         <Button
                           colorScheme="blackAlpha"
                           variant={
@@ -194,7 +190,13 @@ const TodoModal: React.FC<TodoModalProps> = ({
                   <Button colorScheme="gray" mr={2} onClick={onClose}>
                     Close
                   </Button>
-                  <Button type="submit" colorScheme="purple">
+                  <Button
+                    type="submit"
+                    colorScheme="purple"
+                    isDisabled={loading}
+                    isLoading={loading}
+                    loadingText="Creating todo..."
+                  >
                     Submit
                   </Button>
                 </Stack>
@@ -207,9 +209,7 @@ const TodoModal: React.FC<TodoModalProps> = ({
   );
 };
 
-type ModalManagerProps = {
-  onSave(values: Todo): void;
-  initialValues?: Partial<Todo>;
+type ModalManagerProps = Omit<TodoModalProps, 'isOpen' | 'onClose'> & {
   triggerFunc({ trigger }: { trigger(): void }): React.ReactNode;
 };
 

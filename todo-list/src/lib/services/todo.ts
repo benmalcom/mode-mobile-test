@@ -1,11 +1,16 @@
 import { createRequest } from '~/lib/services/http';
-import type { Todo } from '~/lib/types/todo';
+import type { Todo, TodoRecord } from '~/lib/types/todo';
 
 // Fetch all ToDos
 export const getToDos = async (
-  params: Record<string, unknown> = {}
-): Promise<Todo[]> => {
-  const response = await createRequest<Todo[]>({ url: '/todos', params });
+  params: Record<string, unknown>,
+  signal: AbortSignal
+): Promise<TodoRecord> => {
+  const response = await createRequest<TodoRecord>({
+    url: '/todos',
+    params,
+    signal,
+  });
   return response.data; // Extract data from Axios response
 };
 

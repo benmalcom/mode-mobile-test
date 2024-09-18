@@ -16,8 +16,14 @@ const triggerButton = ({ trigger }: { trigger(): void }) => (
   </Button>
 );
 
-type TodoActionsProps = {};
-export const TodoActions: React.FC<TodoActionsProps> = () => {
+type TodoActionsProps = {
+  onCreate(values: Record<string, unknown>, callback?: () => void): void;
+  isCreating?: boolean;
+};
+export const TodoActions: React.FC<TodoActionsProps> = ({
+  onCreate,
+  isCreating,
+}) => {
   return (
     <Flex
       justify="space-between"
@@ -40,7 +46,20 @@ export const TodoActions: React.FC<TodoActionsProps> = () => {
           colorScheme="purple"
         />
       </InputGroup>
-      <ModalManager onSave={() => {}} triggerFunc={triggerButton} />
+      <ModalManager
+        loading={isCreating}
+        onSave={onCreate}
+        triggerFunc={({ trigger }) => (
+          <Button
+            size="sm"
+            colorScheme="purple"
+            rounded="2xl"
+            onClick={() => trigger()}
+          >
+            New Task
+          </Button>
+        )}
+      />
     </Flex>
   );
 };
