@@ -1,16 +1,40 @@
+import { defineChain } from 'viem';
 import { http, createConfig } from 'wagmi';
-import { mainnet } from 'wagmi/chains';
-import { injected, metaMask, walletConnect } from 'wagmi/connectors';
+import { metaMask } from 'wagmi/connectors';
 
-import { polygonAmoyTestnet, polygonRPCUrl } from '~/lib/web3/chains';
+// Define Polygon Amoy Testnet
+
+export const polygonRPCUrl = 'https://rpc-amoy.polygon.technology';
+
+export const polygonAmoyTestnet = defineChain({
+  id: 80_002,
+  name: 'Polygon Amoy Testnet',
+  network: 'polygon-amoy',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'MATIC',
+    symbol: 'MATIC',
+  },
+  rpcUrls: {
+    default: {
+      http: [polygonRPCUrl],
+    },
+    public: {
+      http: [polygonRPCUrl],
+    },
+  },
+  blockExplorers: {
+    default: { name: 'PolygonScan', url: 'https://amoy.polygonscan.com' },
+  },
+  testnet: true,
+});
 
 const projectId = '457751f94c56c29d849a484620dcb62c';
 
 export const config = createConfig({
-  chains: [mainnet, polygonAmoyTestnet],
-  connectors: [injected(), walletConnect({ projectId }), metaMask()],
+  chains: [polygonAmoyTestnet],
+  connectors: [metaMask()],
   transports: {
-    [mainnet.id]: http(),
     [polygonAmoyTestnet.id]: http(polygonRPCUrl),
   },
 });

@@ -11,8 +11,9 @@ import type { ReactNode } from 'react';
 import type { Connector } from 'wagmi';
 import { useAccount, useConnect, useDisconnect, useSignMessage } from 'wagmi';
 
-import { formatConnectErrors } from '~/lib/web3/error';
-import { signAndVerifyMessage } from '~/lib/web3/verify-message';
+import { useDefaultChain } from '~/lib/hooks/useDefaultChain';
+import { formatConnectErrors } from '~/lib/utils/error';
+import { signAndVerifyMessage } from '~/lib/utils/verify-message';
 
 interface Web3AuthContextType {
   connect: () => void;
@@ -33,6 +34,7 @@ const Web3AuthContext = createContext<Web3AuthContextType | undefined>(
 const MESSAGE_VERIFIED_KEY = 'messageVerified';
 
 export function Web3AuthProvider({ children }: { children: ReactNode }) {
+  useDefaultChain();
   const { address, isConnected } = useAccount();
   const { connect, connectors, error, isPending } = useConnect();
   const { disconnect } = useDisconnect();
