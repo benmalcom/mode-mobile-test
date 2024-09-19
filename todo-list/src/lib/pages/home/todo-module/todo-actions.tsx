@@ -8,7 +8,7 @@ import {
 } from '@chakra-ui/react';
 import type React from 'react';
 
-import { ModalManager } from '~/lib/pages/home/todo-module/todo-modal-manager';
+import { ModalManager } from '~/lib/pages/home/todo-module/add-edit-modal';
 
 const triggerButton = ({ trigger }: { trigger(): void }) => (
   <Button size="sm" colorScheme="purple" rounded="2xl" onClick={trigger}>

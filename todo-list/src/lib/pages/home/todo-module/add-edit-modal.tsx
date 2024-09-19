@@ -32,7 +32,7 @@ type TodoWithOptionalId = Omit<Todo, 'id'> & { id?: string };
 
 type TodoModalProps = {
   onSave(values: TodoWithOptionalId, callback?: () => void): void;
-  initialValues?: Partial<Todo>;
+  initialValues?: Todo;
   isOpen: boolean;
   onClose(): void;
   loading?: boolean;
@@ -79,7 +79,6 @@ const TodoModal: React.FC<TodoModalProps> = ({
     formState: { errors = {} },
     control,
     watch,
-    setValue,
   } = useForm<TodoFormValues>({
     resolver: yupResolver(schema) as unknown as Resolver<TodoFormValues>,
     shouldUnregister: true,
@@ -103,7 +102,7 @@ const TodoModal: React.FC<TodoModalProps> = ({
       />
       <ModalContent>
         <ModalHeader>
-          {initialValues?.id ? 'Edit Todo' : 'Add Todo'}
+          {initialValues?.id ? 'Edit Todo' : 'Add Todo'}{' '}
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
@@ -156,25 +155,29 @@ const TodoModal: React.FC<TodoModalProps> = ({
 
                   <FormControl isInvalid={Boolean(errors.priority)}>
                     <FormLabel htmlFor="priority">Priority</FormLabel>
-                    <Stack direction="row" spacing={1} align="center">
-                      {TODO_PRIORITIES.map((item, index) => (
-                        <Button
-                          colorScheme="blackAlpha"
-                          variant={
-                            formValues.priority === item.value
-                              ? 'solid'
-                              : 'outline'
-                          }
-                          key={`${item.label + index}`}
-                          size="sm"
-                          onClick={() =>
-                            setValue('priority', item.value as TodoPriority)
-                          }
-                        >
-                          {item.label}
-                        </Button>
-                      ))}
-                    </Stack>
+                    <Controller
+                      name="priority"
+                      control={control}
+                      render={({ field }) => (
+                        <Stack direction="row" spacing={1} align="center">
+                          {TODO_PRIORITIES.map((item, index) => (
+                            <Button
+                              colorScheme="blackAlpha"
+                              variant={
+                                field.value === item.value ? 'solid' : 'outline'
+                              }
+                              key={`${item.label + index}`}
+                              size="sm"
+                              onClick={() =>
+                                field.onChange(item.value as TodoPriority)
+                              }
+                            >
+                              {item.label}
+                            </Button>
+                          ))}
+                        </Stack>
+                      )}
+                    />
                     <FormErrorMessage>
                       {errors?.priority?.message &&
                         errors.priority.message.toString()}
@@ -227,21 +230,13 @@ type ModalManagerProps = Omit<TodoModalProps, 'isOpen' | 'onClose'> & {
 };
 
 export const ModalManager: React.FC<ModalManagerProps> = ({
-  onSave,
-  initialValues,
   triggerFunc,
-  ...rest
+  ...props
 }) => {
   const { isOpen, onToggle } = useDisclosure();
   return (
     <>
-      <TodoModal
-        isOpen={isOpen}
-        onClose={onToggle}
-        onSave={onSave}
-        initialValues={initialValues}
-        {...rest}
-      />
+      <TodoModal isOpen={isOpen} onClose={onToggle} {...props} />
       {triggerFunc({
         trigger: onToggle,
       })}

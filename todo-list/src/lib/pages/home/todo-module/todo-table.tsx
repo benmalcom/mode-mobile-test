@@ -25,7 +25,8 @@ import type React from 'react';
 import { BsThreeDots } from 'react-icons/bs';
 import { FaCircleCheck } from 'react-icons/fa6';
 
-import { ModalManager } from '~/lib/pages/home/todo-module/todo-modal-manager';
+import { ModalManager as EditTodoModal } from '~/lib/pages/home/todo-module/add-edit-modal';
+import { ModalManager as ViewTodoModal } from '~/lib/pages/home/todo-module/view-modal';
 import type { Todo, TodoPagination, TodoPriority } from '~/lib/types/todo';
 import { TODO_PRIORITIES } from '~/lib/utils/constants';
 
@@ -85,6 +86,7 @@ export const TodoTable: React.FC<TableProps> = ({
   deleting,
   loading,
 }) => {
+  console.log('todos...', todos);
   return (
     <TableContainer bg="white" boxShadow="md">
       <Table size="md" variant="simple">
@@ -171,7 +173,7 @@ export const TodoTable: React.FC<TableProps> = ({
                           </EnhancedMenuItem>
                         )}
 
-                        <ModalManager
+                        <EditTodoModal
                           loading={updating.has(todo.id)}
                           onSave={(values, callback) =>
                             onUpdate(
@@ -188,9 +190,14 @@ export const TodoTable: React.FC<TableProps> = ({
                           )}
                         />
 
-                        <EnhancedMenuItem onClick={() => onDelete(todo.id)}>
-                          More Info
-                        </EnhancedMenuItem>
+                        <ViewTodoModal
+                          todo={todo}
+                          triggerFunc={({ trigger }) => (
+                            <EnhancedMenuItem onClick={() => trigger()}>
+                              More Info
+                            </EnhancedMenuItem>
+                          )}
+                        />
                         <EnhancedMenuItem
                           color="red.500"
                           onClick={() => onDelete(todo.id)}
