@@ -33,7 +33,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
         <ModalHeader>{todo.title}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Box bg="gray.100" borderRadius="sm" p={2}>
+          <Box bg="gray.50" borderRadius="sm" p={2}>
             {todo.description}
           </Box>
         </ModalBody>

@@ -15,10 +15,10 @@ const ERC20_ADDRESS = '0xf02f35bF1C8D2c3a1e7255FD9AddC8F2182e0627';
 const NFT_ADDRESS = '0x8E1096fd5C8Ca1EFdC1BC2F64Ae439E0888b1A46';
 
 type PortfolioProps = {
-  enabled?: boolean;
+  isTwoCompleted?: boolean;
 };
 
-export const Portfolio: React.FC<PortfolioProps> = () => {
+export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
   const { address } = useWeb3Auth();
 
   // Fetch balance function
@@ -138,6 +138,7 @@ export const Portfolio: React.FC<PortfolioProps> = () => {
           leftIcon={<MdOutlineCreateNewFolder />}
           iconSpacing={1}
           onClick={() => mintNFT()}
+          isDisabled={!isTwoCompleted}
         >
           Mint NFT
         </Button>

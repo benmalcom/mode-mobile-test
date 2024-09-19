@@ -7,7 +7,9 @@ export const Button: ComponentStyleConfig = {
       color: 'white',
       border: 'none',
       _hover: {
-        bg: 'gray.700', // Darker shade on hover
+        _disabled: {
+          bg: 'black', // Maintain original background color
+        },
       },
       _active: {
         bg: 'gray.800', // Even darker shade when active

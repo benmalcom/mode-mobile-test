@@ -19,6 +19,8 @@ import {
   MenuButton,
   MenuItem,
   Skeleton,
+  TableCaption,
+  Highlight,
 } from '@chakra-ui/react';
 import { format } from 'date-fns';
 import type React from 'react';
@@ -86,10 +88,18 @@ export const TodoTable: React.FC<TableProps> = ({
   deleting,
   loading,
 }) => {
-  console.log('todos...', todos);
   return (
     <TableContainer bg="white" boxShadow="md">
       <Table size="md" variant="simple">
+        <TableCaption>
+          {!loading && todos.length === 0 && (
+            <Highlight query="New Task" styles={{ color: 'purple.500' }}>
+              You currently don&apos;t have any task, use the New Task button to
+              create one.
+            </Highlight>
+          )}
+        </TableCaption>
+
         <Thead bg="gray.100">
           <Tr py={2}>
             <Th>Title</Th>
@@ -214,40 +224,42 @@ export const TodoTable: React.FC<TableProps> = ({
           {loading && <SkeletonLoader />}
         </Tbody>
 
-        <Tfoot>
-          <Tr>
-            <Td colSpan={5}>
-              <Flex justify="space-between" align="center" mt={4}>
-                <Text fontSize="sm" color="gray.600">
-                  Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-                  {Math.min(
-                    pagination.page * pagination.limit,
-                    pagination.total
-                  )}{' '}
-                  of {pagination.total} entries
-                </Text>
-                <Flex gap={2}>
-                  <Button
-                    size="sm"
-                    isDisabled={pagination.page <= 1}
-                    onClick={() => console.log('Previous')}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => console.log('Next')}
-                    isDisabled={
-                      pagination.total <= pagination.limit * pagination.page
-                    }
-                  >
-                    Next
-                  </Button>
+        {pagination.total < 0 && (
+          <Tfoot>
+            <Tr>
+              <Td colSpan={5}>
+                <Flex justify="space-between" align="center" mt={4}>
+                  <Text fontSize="sm" color="gray.600">
+                    Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
+                    {Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.total
+                    )}{' '}
+                    of {pagination.total} entries
+                  </Text>
+                  <Flex gap={2}>
+                    <Button
+                      size="sm"
+                      isDisabled={pagination.page <= 1}
+                      onClick={() => console.log('Previous')}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => console.log('Next')}
+                      isDisabled={
+                        pagination.total <= pagination.limit * pagination.page
+                      }
+                    >
+                      Next
+                    </Button>
+                  </Flex>
                 </Flex>
-              </Flex>
-            </Td>
-          </Tr>
-        </Tfoot>
+              </Td>
+            </Tr>
+          </Tfoot>
+        )}
       </Table>
     </TableContainer>
   );
