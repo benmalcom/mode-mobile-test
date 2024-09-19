@@ -8,10 +8,17 @@ export type Todo = {
   priority: TodoPriority;
   completed?: boolean;
 };
-
-export type TodoRecord = {
-  data: Todo[];
+// Base pagination type to avoid repetition
+export type Pagination = {
   page: number;
   limit: number;
   total: number;
 };
+
+// Extend the base pagination type to include todo data
+export type TodoRecord = Pagination & {
+  data: Todo[];
+};
+
+// Use the base pagination type directly for TodoPagination
+export type TodoPagination = Pagination;

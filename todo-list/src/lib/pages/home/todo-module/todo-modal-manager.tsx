@@ -15,6 +15,8 @@ import {
   Input,
   FormErrorMessage,
   Textarea,
+  Flex,
+  FormHelperText,
 } from '@chakra-ui/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { SingleDatepicker } from 'chakra-dayzed-datepicker';
@@ -26,8 +28,10 @@ import * as yup from 'yup';
 import type { Todo, TodoPriority } from '~/lib/types/todo';
 import { TODO_PRIORITIES } from '~/lib/utils/constants';
 
+type TodoWithOptionalId = Omit<Todo, 'id'> & { id?: string };
+
 type TodoModalProps = {
-  onSave(values: Omit<Todo, 'id'>, callback?: () => void): void;
+  onSave(values: TodoWithOptionalId, callback?: () => void): void;
   initialValues?: Partial<Todo>;
   isOpen: boolean;
   onClose(): void;
@@ -43,7 +47,10 @@ type TodoFormValues = {
 
 const schema = yup
   .object({
-    title: yup.string().required('The title is required'),
+    title: yup
+      .string()
+      .required('The title is required')
+      .max(30, 'The title must be at most 30 characters'),
     description: yup.string().required('The description is required'),
     priority: yup
       .mixed()
@@ -75,6 +82,7 @@ const TodoModal: React.FC<TodoModalProps> = ({
     setValue,
   } = useForm<TodoFormValues>({
     resolver: yupResolver(schema) as unknown as Resolver<TodoFormValues>,
+    shouldUnregister: true,
     defaultValues: {
       priority: 'medium',
       dueDate: new Date(),
@@ -119,11 +127,17 @@ const TodoModal: React.FC<TodoModalProps> = ({
                       {...register('title')}
                       placeholder="Todo title"
                       errorBorderColor="red.300"
+                      maxLength={30}
                     />
-                    <FormErrorMessage>
-                      {errors?.title?.message &&
-                        errors.title.message.toString()}
-                    </FormErrorMessage>
+                    <Flex justifyContent="space-between">
+                      <FormErrorMessage>
+                        {errors?.title?.message &&
+                          errors.title.message.toString()}
+                      </FormErrorMessage>
+                      <FormHelperText fontSize="sm">
+                        {formValues.title?.length || 0}/30
+                      </FormHelperText>
+                    </Flex>
                   </FormControl>
 
                   <FormControl isInvalid={Boolean(errors.description)}>
@@ -195,7 +209,6 @@ const TodoModal: React.FC<TodoModalProps> = ({
                     colorScheme="purple"
                     isDisabled={loading}
                     isLoading={loading}
-                    loadingText="Creating todo..."
                   >
                     Submit
                   </Button>
@@ -217,6 +230,7 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
   onSave,
   initialValues,
   triggerFunc,
+  ...rest
 }) => {
   const { isOpen, onToggle } = useDisclosure();
   return (
@@ -226,6 +240,7 @@ export const ModalManager: React.FC<ModalManagerProps> = ({
         onClose={onToggle}
         onSave={onSave}
         initialValues={initialValues}
+        {...rest}
       />
       {triggerFunc({
         trigger: onToggle,

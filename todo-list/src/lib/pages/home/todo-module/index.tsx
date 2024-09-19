@@ -11,10 +11,18 @@ import {
   updateToDo,
   deleteToDo,
 } from '~/lib/services/todo';
-import type { Todo } from '~/lib/types/todo';
+import type { Todo, TodoPagination } from '~/lib/types/todo';
+
+const DEFAULT_PAGINATION = {
+  page: 1,
+  limit: 10,
+  total: 1,
+};
 
 export const TodoModule: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [todosPagination, setTodosPagination] =
+    useState<TodoPagination>(DEFAULT_PAGINATION);
   const [inGetTodosFlight, setGetTodosFlight] = useState(true);
   const [getTodosError, setGetTodosError] = useState<string | null>(null);
 
@@ -26,13 +34,14 @@ export const TodoModule: React.FC = () => {
   useEffect(() => {
     const abortController = new AbortController(); // Create an instance of AbortController
 
-    const fetchTodos = async () => {
+    const fetchTodos = async (params: TodoPagination) => {
       try {
-        const response = await getToDos(
-          { page: 1, limit: 10 },
+        const { data, ...rest } = await getToDos(
+          params,
           abortController.signal
         );
-        setTodos(response.data);
+        setTodos(data);
+        setTodosPagination(rest);
       } catch (e) {
         if (!abortController.signal.aborted) {
           setGetTodosError(
@@ -44,7 +53,7 @@ export const TodoModule: React.FC = () => {
       }
     };
 
-    fetchTodos();
+    fetchTodos(DEFAULT_PAGINATION);
 
     return () => {
       abortController.abort(); // Abort fetch on component unmount or effect cleanup
@@ -67,13 +76,19 @@ export const TodoModule: React.FC = () => {
     }
   };
 
-  const handleTodoUpdate = async (todoId: string, updatedTodo: Todo) => {
+  const handleTodoUpdate = async (
+    todoId: string,
+    updatedTodo: Todo,
+    callback?: () => void
+  ) => {
+    console.log('todoId ', todoId);
     setUpdating((prev) => new Set(prev).add(todoId));
     try {
       const updated = await updateToDo(todoId, updatedTodo);
       setTodos((prevTodos) =>
         prevTodos.map((todo) => (todo.id === todoId ? updated : todo))
       );
+      callback?.();
     } catch (e) {
       console.error('Error updating todo:', e);
     } finally {
@@ -114,8 +129,9 @@ export const TodoModule: React.FC = () => {
           loading={inGetTodosFlight}
           onUpdate={handleTodoUpdate}
           onDelete={handleTodoDelete}
-          isUpdating={updating}
-          isDeleting={deleting}
+          updating={updating}
+          deleting={deleting}
+          pagination={todosPagination}
         />
       </Stack>
     </Flex>

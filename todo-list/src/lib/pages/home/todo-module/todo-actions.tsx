@@ -41,9 +41,11 @@ export const TodoActions: React.FC<TodoActionsProps> = ({
         </InputLeftElement>
         <Input
           type="search"
-          placeholder="Search"
+          placeholder="Search todo item"
           rounded="2xl"
           colorScheme="purple"
+          bg="gray.50" // Gray background by default
+          _focus={{ bg: 'white', borderColor: 'purple.500' }} // White background when active
         />
       </InputGroup>
       <ModalManager
