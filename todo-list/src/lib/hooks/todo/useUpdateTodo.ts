@@ -1,3 +1,4 @@
+import { useToast } from '@chakra-ui/react';
 import type React from 'react';
 import { useState } from 'react';
 
@@ -19,6 +20,7 @@ export const useUpdateTodo = (
 ): UseUpdateTodoReturn => {
   const [updating, setUpdating] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
 
   const updateTodo = async (
     todoId: string,
@@ -33,8 +35,17 @@ export const useUpdateTodo = (
           prevTodos.map((todo) => (todo.id === todoId ? updated : todo)) // Replace the updated todo
       );
       callback?.();
+      toast({
+        description: 'Todo updated successfully.',
+        status: 'success',
+      });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error updating todo');
+      const err = e instanceof Error ? e.message : 'Error updating todo';
+      setError(err);
+      toast({
+        description: err,
+        status: 'error',
+      });
     } finally {
       setUpdating((prev) => {
         const updatedSet = new Set(prev);

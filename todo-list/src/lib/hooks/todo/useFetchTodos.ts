@@ -17,6 +17,7 @@ interface UseFetchTodosReturn {
   todosPagination: TodoPagination;
   loading: boolean;
   error: string | null;
+  fetchMoreTodos: () => void; // Add the fetchMoreTodos function to return type
 }
 
 export const useFetchTodos = (): UseFetchTodosReturn => {
@@ -26,33 +27,34 @@ export const useFetchTodos = (): UseFetchTodosReturn => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchTodos = async (params: TodoPagination, append = false) => {
     const abortController = new AbortController(); // Create an AbortController to cancel requests if needed
 
-    const fetchTodos = async (params: TodoPagination) => {
-      try {
-        setLoading(true); // Set loading state to true
-        const { data, ...rest } = await getToDos(
-          params,
-          abortController.signal
-        );
-        setTodos(data); // Update todos state
-        setTodosPagination(rest); // Update pagination state
-      } catch (e) {
-        if (!abortController.signal.aborted) {
-          setError(e instanceof Error ? e.message : 'Error fetching todos');
-        }
-      } finally {
-        setLoading(false); // Set loading state to false
+    try {
+      setLoading(true); // Set loading state to true
+      const { data, ...rest } = await getToDos(params, abortController.signal);
+
+      setTodos((prevTodos) => (append ? [...prevTodos, ...data] : data)); // Append or replace todos
+      setTodosPagination(rest); // Update pagination state
+    } catch (e) {
+      if (!abortController.signal.aborted) {
+        setError(e instanceof Error ? e.message : 'Error fetching todos');
       }
-    };
+    } finally {
+      setLoading(false); // Set loading state to false
+    }
+  };
 
+  useEffect(() => {
     fetchTodos(DEFAULT_PAGINATION); // Fetch initial data
-
-    return () => {
-      abortController.abort(); // Abort the fetch request on component unmount
-    };
   }, []);
+
+  const fetchMoreTodos = () => {
+    const nextPage = todosPagination.page + 1;
+    if (nextPage <= Math.ceil(todosPagination.total / todosPagination.limit)) {
+      fetchTodos({ ...todosPagination, page: nextPage }, true); // Fetch next page and append results
+    }
+  };
 
   return {
     todos,
@@ -60,5 +62,6 @@ export const useFetchTodos = (): UseFetchTodosReturn => {
     todosPagination,
     loading,
     error,
+    fetchMoreTodos, // Export fetchMoreTodos for loading more
   };
 };
