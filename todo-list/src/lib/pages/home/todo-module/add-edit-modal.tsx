@@ -17,6 +17,7 @@ import {
   Textarea,
   Flex,
   FormHelperText,
+  Switch,
 } from '@chakra-ui/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { SingleDatepicker } from 'chakra-dayzed-datepicker';
@@ -43,6 +44,7 @@ type TodoFormValues = {
   description: string;
   priority: TodoPriority;
   dueDate: Date;
+  completed?: boolean;
 };
 
 const schema = yup
@@ -60,6 +62,7 @@ const schema = yup
       )
       .required('Priority is required'),
     dueDate: yup.date().required('The due date is required'),
+    completed: yup.boolean(),
   })
   .required();
 
@@ -201,6 +204,23 @@ const TodoModal: React.FC<TodoModalProps> = ({
                       {errors?.dueDate?.message &&
                         errors.dueDate.message.toString()}
                     </FormErrorMessage>
+                  </FormControl>
+                  <FormControl display="flex" alignItems="center">
+                    <FormLabel htmlFor="completed-todo" mb="0">
+                      Completed
+                    </FormLabel>
+                    <Controller
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <Switch
+                          id="completed-todo"
+                          colorScheme="purple"
+                          onChange={onChange}
+                          isChecked={Boolean(value)}
+                        />
+                      )}
+                      name="completed"
+                    />
                   </FormControl>
                 </Stack>
                 <Stack spacing="1" direction="row" justifyContent="end">

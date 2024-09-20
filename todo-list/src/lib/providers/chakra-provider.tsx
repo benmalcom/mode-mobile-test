@@ -21,6 +21,13 @@ export const ChakraProvider = ({ children }: ChakraProps) => {
       <BaseChakraProvider
         colorModeManager={cookieStorageManager}
         theme={customTheme}
+        toastOptions={{
+          defaultOptions: {
+            position: 'bottom-right',
+            duration: 5000,
+            isClosable: true,
+          },
+        }}
       >
         {children}
       </BaseChakraProvider>
