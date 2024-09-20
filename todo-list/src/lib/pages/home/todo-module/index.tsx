@@ -1,8 +1,7 @@
 import { Flex, Heading, Stack } from '@chakra-ui/react';
 import type React from 'react';
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 
-import { useCompletionTracker } from '~/lib/hooks/todo/useCompletionTracker';
 import { useCreateTodo } from '~/lib/hooks/todo/useCreateTodo';
 import { useDeleteTodo } from '~/lib/hooks/todo/useDeleteTodo';
 import { useFetchTodos } from '~/lib/hooks/todo/useFetchTodos';
@@ -12,25 +11,21 @@ import { TodoActions } from '~/lib/pages/home/todo-module/todo-actions';
 import { TodoTable } from '~/lib/pages/home/todo-module/todo-table';
 
 export const TodoModule: React.FC = () => {
-  const { isTwoCompleted, trackCompletion } = useCompletionTracker();
   const {
     todos,
     todosPagination,
     loading: isFetching,
-    error: fetchError,
     setTodos,
+    fetchMoreTodos,
   } = useFetchTodos();
-  const {
-    createTodo,
-    isCreating,
-    error: createError,
-  } = useCreateTodo(setTodos);
-  const { updateTodo, updating, error: updateError } = useUpdateTodo(setTodos);
-  const { deleteTodo, deleting, error: deleteError } = useDeleteTodo(setTodos);
+  const { createTodo, isCreating } = useCreateTodo(setTodos);
+  const { updateTodo, updating } = useUpdateTodo(setTodos);
+  const { deleteTodo, deleting } = useDeleteTodo(setTodos);
 
-  useEffect(() => {
-    trackCompletion(todos);
-  }, [todos, trackCompletion]);
+  const isTwoCompleted = useMemo(() => {
+    const completedCount = todos.filter((todo) => todo.completed).length;
+    return completedCount >= 2 && completedCount % 2 === 0;
+  }, [todos]);
 
   return (
     <Flex h="full" gap={10} w="1180px" mx="auto" mt={28}>
@@ -48,6 +43,7 @@ export const TodoModule: React.FC = () => {
           updating={updating}
           deleting={deleting}
           pagination={todosPagination}
+          fetchMoreTodos={fetchMoreTodos}
         />
       </Stack>
     </Flex>

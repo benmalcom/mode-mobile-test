@@ -78,6 +78,7 @@ type TableProps = {
   deleting: Set<string>;
   onUpdate(todoId: string, updatedTodo: Todo, callback?: () => void): void;
   onDelete(todoId: string): void;
+  fetchMoreTodos: () => void; // Add the fetchMoreTodos function to return type
 };
 export const TodoTable: React.FC<TableProps> = ({
   todos,
@@ -87,18 +88,20 @@ export const TodoTable: React.FC<TableProps> = ({
   onDelete,
   deleting,
   loading,
+  fetchMoreTodos,
 }) => {
+  const handleFetchMore = () => fetchMoreTodos();
   return (
     <TableContainer bg="white" boxShadow="md">
       <Table size="md" variant="simple">
-        <TableCaption>
-          {!loading && todos.length === 0 && (
+        {!loading && todos.length === 0 && (
+          <TableCaption>
             <Highlight query="New Task" styles={{ color: 'purple.500' }}>
               You currently don&apos;t have any task, use the New Task button to
               create one.
             </Highlight>
-          )}
-        </TableCaption>
+          </TableCaption>
+        )}
 
         <Thead bg="gray.100">
           <Tr py={2}>
@@ -224,7 +227,7 @@ export const TodoTable: React.FC<TableProps> = ({
           {loading && <SkeletonLoader />}
         </Tbody>
 
-        {pagination.total < 0 && (
+        {pagination.total > 0 && (
           <Tfoot>
             <Tr>
               <Td colSpan={5}>
@@ -237,24 +240,18 @@ export const TodoTable: React.FC<TableProps> = ({
                     )}{' '}
                     of {pagination.total} entries
                   </Text>
-                  <Flex gap={2}>
-                    <Button
-                      size="sm"
-                      isDisabled={pagination.page <= 1}
-                      onClick={() => console.log('Previous')}
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => console.log('Next')}
-                      isDisabled={
-                        pagination.total <= pagination.limit * pagination.page
-                      }
-                    >
-                      Next
-                    </Button>
-                  </Flex>
+                  <Button
+                    size="sm"
+                    isDisabled={
+                      pagination.page * pagination.limit >= pagination.total ||
+                      loading
+                    }
+                    isLoading={loading}
+                    loadingText="Fetching more..."
+                    onClick={handleFetchMore}
+                  >
+                    Load older todos
+                  </Button>
                 </Flex>
               </Td>
             </Tr>
