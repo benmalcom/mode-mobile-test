@@ -1,6 +1,7 @@
 import { Flex, Heading, Stack } from '@chakra-ui/react';
+import type { ChangeEvent } from 'react';
 import type React from 'react';
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 
 import { useCreateTodo } from '~/lib/hooks/todo/useCreateTodo';
 import { useDeleteTodo } from '~/lib/hooks/todo/useDeleteTodo';
@@ -21,11 +22,25 @@ export const TodoModule: React.FC = () => {
   const { createTodo, isCreating } = useCreateTodo(setTodos);
   const { updateTodo, updating } = useUpdateTodo(setTodos);
   const { deleteTodo, deleting } = useDeleteTodo(setTodos);
+  const [searchTerm, setSearchTerm] = useState<string>(''); // State for search term
 
   const isTwoCompleted = useMemo(() => {
     const completedCount = todos.filter((todo) => todo.completed).length;
     return completedCount >= 2 && completedCount % 2 === 0;
   }, [todos]);
+
+  // Filter todos based on search term
+  const filteredTodos = useMemo(() => {
+    if (!searchTerm) return todos;
+    return todos.filter((todo) =>
+      todo.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [todos, searchTerm]);
+
+  // Handle search input change
+  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
 
   return (
     <Flex h="full" gap={10} w="1180px" mx="auto" mt={28}>
@@ -34,9 +49,13 @@ export const TodoModule: React.FC = () => {
         <Heading as="h3" size="xl" fontWeight={500} color="purple.900">
           Todo List
         </Heading>
-        <TodoActions onCreate={createTodo} isCreating={isCreating} />
+        <TodoActions
+          onCreate={createTodo}
+          isCreating={isCreating}
+          onSearch={handleSearch}
+        />
         <TodoTable
-          todos={todos}
+          todos={filteredTodos}
           loading={isFetching}
           onUpdate={updateTodo}
           onDelete={deleteTodo}

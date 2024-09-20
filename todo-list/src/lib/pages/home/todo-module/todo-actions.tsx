@@ -7,6 +7,7 @@ import {
   Input,
 } from '@chakra-ui/react';
 import type React from 'react';
+import type { ChangeEvent } from 'react';
 
 import { ModalManager } from '~/lib/pages/home/todo-module/add-edit-modal';
 
@@ -19,10 +20,12 @@ const triggerButton = ({ trigger }: { trigger(): void }) => (
 type TodoActionsProps = {
   onCreate(values: Record<string, unknown>, callback?: () => void): void;
   isCreating?: boolean;
+  onSearch(e: ChangeEvent<HTMLInputElement>): void;
 };
 export const TodoActions: React.FC<TodoActionsProps> = ({
   onCreate,
   isCreating,
+  onSearch,
 }) => {
   return (
     <Flex
@@ -46,6 +49,7 @@ export const TodoActions: React.FC<TodoActionsProps> = ({
           colorScheme="purple"
           bg="gray.50" // Gray background by default
           _focus={{ bg: 'white', borderColor: 'purple.500' }} // White background when active
+          onChange={onSearch}
         />
       </InputGroup>
       <ModalManager
