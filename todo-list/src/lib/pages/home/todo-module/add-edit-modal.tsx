@@ -205,23 +205,25 @@ const TodoModal: React.FC<TodoModalProps> = ({
                         errors.dueDate.message.toString()}
                     </FormErrorMessage>
                   </FormControl>
-                  <FormControl display="flex" alignItems="center">
-                    <FormLabel htmlFor="completed-todo" mb="0">
-                      Completed
-                    </FormLabel>
-                    <Controller
-                      control={control}
-                      render={({ field: { onChange, value } }) => (
-                        <Switch
-                          id="completed-todo"
-                          colorScheme="purple"
-                          onChange={onChange}
-                          isChecked={Boolean(value)}
-                        />
-                      )}
-                      name="completed"
-                    />
-                  </FormControl>
+                  {initialValues?.id && (
+                    <FormControl display="flex" alignItems="center">
+                      <FormLabel htmlFor="completed-todo" mb="0">
+                        Completed
+                      </FormLabel>
+                      <Controller
+                        control={control}
+                        render={({ field: { onChange, value } }) => (
+                          <Switch
+                            id="completed-todo"
+                            colorScheme="purple"
+                            onChange={onChange}
+                            isChecked={Boolean(value)}
+                          />
+                        )}
+                        name="completed"
+                      />
+                    </FormControl>
+                  )}
                 </Stack>
                 <Stack spacing="1" direction="row" justifyContent="end">
                   <Button colorScheme="gray" mr={2} onClick={onClose}>
