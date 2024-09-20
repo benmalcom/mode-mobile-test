@@ -1,18 +1,18 @@
-import { Flex, Button, Heading, Text, Skeleton } from '@chakra-ui/react';
+import { Flex, Button, Heading, Text, Skeleton, Stack } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import type React from 'react';
-import { useEffect } from 'react';
 import { GiBurningBlobs } from 'react-icons/gi';
 import { MdOutlineCreateNewFolder } from 'react-icons/md';
 import { useReadContract } from 'wagmi';
 
 import ERC20ContractAbi from '~/lib/data/ERC20-ABI.json';
-import ERC721ContractAbi from '~/lib/data/ERC721-ABI.json';
+import useNFTActions from '~/lib/hooks/useNFTActions';
+import { useTokenStorage } from '~/lib/hooks/useTokenStorage';
 import { useWeb3Auth } from '~/lib/providers/web3-provider';
 import { polygonAmoyTestnet } from '~/lib/utils/wagmi-config';
 
 const ERC20_ADDRESS = '0xf02f35bF1C8D2c3a1e7255FD9AddC8F2182e0627';
-const NFT_ADDRESS = '0x8E1096fd5C8Ca1EFdC1BC2F64Ae439E0888b1A46';
+const ERC20_DECIMALS = 18;
 
 type PortfolioProps = {
   isTwoCompleted?: boolean;
@@ -20,40 +20,21 @@ type PortfolioProps = {
 
 export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
   const { address } = useWeb3Auth();
+  const { mintNFT, mintLoading, burnLoading, burnNFT } = useNFTActions();
+  const { addTokenId, removeTokenId, tokenIds } = useTokenStorage(address!);
 
-  // Fetch balance function
-  async function fetchBalance(userAddress: string) {
-    // Provider (using a public Ethereum node, e.g., Infura, Alchemy)
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
-
-    // Contract instance
-    const contract = new ethers.Contract(
-      ERC20_ADDRESS,
-      ERC20ContractAbi.abi,
-      signer
-    );
-
-    try {
-      // Fetch the token balance for the userAddress
-      const balance = await contract.balanceOf(userAddress);
-
-      // Fetch the token decimals
-      const decimals = await contract.decimals();
-
-      // Adjust the balance to account for decimals
-      const adjustedBalance = ethers.formatUnits(balance, decimals);
-
-      console.log(`Balance: ${adjustedBalance} tokens`);
-    } catch (error) {
-      console.error('Error fetching balance:', error);
-    }
-  }
+  // Utility function to format balance
+  const formatBalance = (balance: ethers.BigNumberish) => {
+    if (!balance) return '0';
+    const formatted = ethers.formatUnits(balance, ERC20_DECIMALS);
+    return parseFloat(formatted).toFixed(2);
+  };
 
   const {
     data: balance,
     isError,
     isLoading,
+    refetch: refetchBalance,
   } = useReadContract({
     address: ERC20_ADDRESS,
     abi: ERC20ContractAbi.abi,
@@ -61,39 +42,19 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
     args: [address],
   });
 
-  console.log('balance ', balance);
+  const mintCallback = (tokenId: number) => addTokenId(tokenId);
 
-  useEffect(() => {
-    fetchBalance(address!);
-  }, [address]);
+  const burnCallback = (tokenId: number) => {
+    removeTokenId(tokenId);
+    refetchBalance();
+  };
 
-  // NFT contract address
-
-  async function mintNFT() {
-    try {
-      // Connect to the user's MetaMask
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-
-      // Create a contract instance
-      const nftContract = new ethers.Contract(
-        NFT_ADDRESS,
-        ERC721ContractAbi.abi,
-        signer
-      );
-
-      // Call the mint function
-      const tx = await nftContract.mint();
-
-      console.log('Minting... please wait.');
-      await tx.wait();
-      console.log('NFT minted successfully!');
-
-      // console.log(`New balance: ${balance1.toString()} NFTs`);
-    } catch (err) {
-      console.error('Error minting NFT:', err);
+  const handleBurnToken = () => {
+    if (tokenIds.length > 0) {
+      const tokenId = tokenIds[tokenIds.length - 1];
+      burnNFT(tokenId, burnCallback);
     }
-  }
+  };
 
   return (
     <Flex
@@ -124,34 +85,46 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
               Error fetching balance
             </Text>
           ) : (
-            <Heading color="black" as="h4" size="lg" textAlign="center">
-              {balance?.toString()} {polygonAmoyTestnet.nativeCurrency.symbol}
+            <Heading color="black" as="h5" size="md" textAlign="center">
+              {formatBalance(balance as ethers.BigNumberish)}{' '}
+              {polygonAmoyTestnet.nativeCurrency.symbol}
             </Heading>
           )}
         </Skeleton>
       </Flex>
-
-      <Flex w="full" justify="space-between">
-        <Button
-          variant="custom"
-          rounded="3xl"
-          leftIcon={<MdOutlineCreateNewFolder />}
-          iconSpacing={1}
-          onClick={() => mintNFT()}
-          isDisabled={!isTwoCompleted}
-        >
-          Mint NFT
-        </Button>
-        <Button
-          colorScheme="red"
-          rounded="3xl"
-          leftIcon={<GiBurningBlobs />}
-          iconSpacing={1}
-          variant="outline"
-        >
-          Burn NFT
-        </Button>
-      </Flex>
+      <Stack w="full" spacing={4}>
+        <Flex w="full" justify="space-between">
+          <Button
+            variant="custom"
+            rounded="3xl"
+            leftIcon={<MdOutlineCreateNewFolder />}
+            iconSpacing={1}
+            onClick={() => mintNFT(mintCallback)}
+            isDisabled={!isTwoCompleted || mintLoading}
+            isLoading={mintLoading}
+            loadingText="Minting..."
+          >
+            Mint NFT
+          </Button>
+          <Button
+            colorScheme="red"
+            rounded="3xl"
+            leftIcon={<GiBurningBlobs />}
+            iconSpacing={1}
+            variant="outline"
+            isLoading={burnLoading}
+            isDisabled={burnLoading || Boolean(!tokenIds.length)}
+            onClick={handleBurnToken}
+            loadingText="Burning..."
+          >
+            Burn NFT
+          </Button>
+        </Flex>
+        <Flex h="35px" bg="gray.100" w="full" align="center" px={3} gap={1}>
+          <Text color="gray.600">Total NFTs minted: </Text>
+          <Text color="gray.800">{tokenIds.length}</Text>
+        </Flex>
+      </Stack>
     </Flex>
   );
 };
