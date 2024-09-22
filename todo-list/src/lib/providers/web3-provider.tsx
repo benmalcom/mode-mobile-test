@@ -18,8 +18,8 @@ import {
 } from 'wagmi';
 
 import { useDefaultChain } from '~/lib/hooks/useDefaultChain';
+import { useMessageVerification } from '~/lib/hooks/useMessageVerification';
 import { formatConnectErrors } from '~/lib/utils/error';
-import { signAndVerifyMessage } from '~/lib/utils/verify-message';
 
 interface Web3AuthContextType {
   connect: () => void;
@@ -36,8 +36,6 @@ const Web3AuthContext = createContext<Web3AuthContextType | undefined>(
   undefined
 );
 
-const MESSAGE_VERIFIED_KEY = 'messageVerified';
-
 export function Web3AuthProvider({ children }: { children: ReactNode }) {
   useDefaultChain();
   const { state } = useConfig();
@@ -45,73 +43,16 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
   const { connect, connectors, error, isPending } = useConnect();
   const { disconnect } = useDisconnect();
   const { signMessageAsync } = useSignMessage();
-
-  const [isMessageVerified, setIsMessageVerified] = useState(() => {
-    return (
-      typeof window !== 'undefined' &&
-      localStorage.getItem(MESSAGE_VERIFIED_KEY) === 'true'
-    );
-  });
-
-  const [isSigningMessage, setIsSigningMessage] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const message = useMemo(
-    () => `Sign this message to authenticate\n${new Date().toISOString()}`,
-    []
-  );
-
   useEffect(() => setIsClient(true), []);
 
-  const handleMessageSignAndVerify = useCallback(async () => {
-    setIsSigningMessage(true);
-    if (!isConnected || !address) {
-      setErrorMessage('Wallet not connected or address missing.');
-      disconnect();
-      return;
-    }
-    try {
-      await signAndVerifyMessage(signMessageAsync, address, message);
-      setIsMessageVerified(true);
-    } catch (err) {
-      const errorMsg =
-        err instanceof Error
-          ? err.message
-          : 'Unknown error occurred during message signing';
-      setErrorMessage(errorMsg);
-      disconnect();
-    } finally {
-      setIsSigningMessage(false);
-    }
-  }, [isConnected, address, signMessageAsync, message, disconnect]);
+  const { isMessageVerified, isSigningMessage, errorMessage, setErrorMessage } =
+    useMessageVerification(isConnected, address, signMessageAsync, disconnect);
 
-  useEffect(() => {
-    if (!isConnected) {
-      setIsMessageVerified(false);
-    }
-  }, [isConnected]);
-
-  useEffect(() => {
-    localStorage.setItem(MESSAGE_VERIFIED_KEY, String(isMessageVerified));
-  }, [isMessageVerified]);
-
-  useEffect(() => {
-    if (isConnected && !isMessageVerified) {
-      handleMessageSignAndVerify().catch((err) => {
-        setErrorMessage(err instanceof Error ? err.message : 'Unknown error');
-        disconnect();
-      });
-    }
-  }, [isConnected, isMessageVerified, handleMessageSignAndVerify, disconnect]);
-
-  useEffect(() => {
-    if (error) {
-      setErrorMessage(formatConnectErrors(error as ConnectErrorType));
-    }
-  }, [error]);
-
-  const clearError = useCallback(() => setErrorMessage(null), []);
+  const clearError = useCallback(
+    () => setErrorMessage(null),
+    [setErrorMessage]
+  );
 
   const handleConnect = useCallback(() => {
     disconnect();
@@ -125,26 +66,33 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
       setErrorMessage('MetaMask not found');
       return;
     }
-    connect({
-      connector: metaMaskConnector,
-    });
-  }, [clearError, connect, connectors, disconnect, isConnected, isPending]);
+    connect({ connector: metaMaskConnector });
+  }, [
+    clearError,
+    connect,
+    connectors,
+    disconnect,
+    isConnected,
+    isPending,
+    setErrorMessage,
+  ]);
 
   useEffect(() => {
-    // The config state from wagmi holds on to connection data even after disconnect,  we need to disconnect it for total reset
     if (state.current && state.status === 'disconnected') {
       disconnect();
     }
   }, [disconnect, state]);
 
-  const handleDisconnect = useCallback(() => {
-    disconnect();
-  }, [disconnect]);
+  useEffect(() => {
+    if (error) {
+      setErrorMessage(formatConnectErrors(error as ConnectErrorType));
+    }
+  }, [error, setErrorMessage]);
 
   const value = useMemo(
     () => ({
       connect: handleConnect,
-      disconnect: handleDisconnect,
+      disconnect,
       isConnected: isConnected && isMessageVerified,
       isConnecting: isPending || isSigningMessage,
       error,
@@ -154,7 +102,7 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
     }),
     [
       handleConnect,
-      handleDisconnect,
+      disconnect,
       isConnected,
       isMessageVerified,
       isPending,
