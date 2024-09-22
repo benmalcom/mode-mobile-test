@@ -1,6 +1,7 @@
 import type { ThemeConfig } from '@chakra-ui/react';
 
 export const config: ThemeConfig = {
-  initialColorMode: 'system',
-  disableTransitionOnChange: false,
+  initialColorMode: 'light', // Start in light mode by default
+  useSystemColorMode: false, // Do not use the system preference
+  disableTransitionOnChange: false, // Keep transitions enabled during mode change
 };
