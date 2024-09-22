@@ -9,10 +9,12 @@ npm i -g pnpm
 ### Setup
 
 Install the dependencies:
-
 ```bash
 pnpm install
 ```
+- Create a `.env` file in the root directory
+- Copy the content of `.env.example` into `.env`
+
 ### Run the development server
 
 ```bash
