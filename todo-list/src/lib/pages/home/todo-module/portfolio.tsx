@@ -1,60 +1,65 @@
-import { Flex, Button, Heading, Text, Skeleton, Stack } from '@chakra-ui/react';
-import { ethers } from 'ethers';
+import {
+  Flex,
+  Button,
+  Heading,
+  Text,
+  Skeleton,
+  Stack,
+  useToast,
+} from '@chakra-ui/react';
 import type React from 'react';
 import { GiBurningBlobs } from 'react-icons/gi';
 import { MdOutlineCreateNewFolder } from 'react-icons/md';
-import { useReadContract } from 'wagmi';
 
-import ERC20ContractAbi from '~/lib/data/ERC20-ABI.json';
-import useNFTActions from '~/lib/hooks/useNFTActions';
-import { useTokenStorage } from '~/lib/hooks/useTokenStorage';
-import { useWeb3Auth } from '~/lib/providers/web3-provider';
-import { polygonAmoyTestnet } from '~/lib/utils/wagmi-config';
-
-const ERC20_ADDRESS = '0xf02f35bF1C8D2c3a1e7255FD9AddC8F2182e0627';
-const ERC20_DECIMALS = 18;
+import { usePortfolio } from '~/lib/hooks/usePortfolio';
+import { formatBalance } from '~/lib/utils/formatters';
 
 type PortfolioProps = {
   isTwoCompleted?: boolean;
 };
 
-export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
-  const { address } = useWeb3Auth();
-  const { mintNFT, mintLoading, burnLoading, burnNFT } = useNFTActions();
-  const { addTokenId, removeTokenId, tokenIds } = useTokenStorage(address!);
+// Utility function to display toast notifications
+const showToast = (
+  toast: ReturnType<typeof useToast>,
+  description: string,
+  status: 'success' | 'error',
+  duration: number = 5000
+) => {
+  toast({ description, status, duration });
+};
 
-  // Utility function to format balance
-  const formatBalance = (balance: ethers.BigNumberish) => {
-    if (!balance) return '0';
-    const formatted = ethers.formatUnits(balance, ERC20_DECIMALS);
-    return parseFloat(formatted).toFixed(2);
-  };
+// Utility function for handling errors
+const handleError = (
+  toast: ReturnType<typeof useToast>,
+  error: Error | unknown
+) => {
+  const message =
+    error instanceof Error
+      ? error.message
+      : 'An error occurred, please refresh browser and try again';
+  showToast(toast, message, 'error', 10000);
+};
+
+export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
+  const toast = useToast();
 
   const {
-    data: balance,
-    isError,
-    isLoading,
-    refetch: refetchBalance,
-  } = useReadContract({
-    address: ERC20_ADDRESS,
-    abi: ERC20ContractAbi.abi,
-    functionName: 'balanceOf',
-    args: [address],
+    tokenBalance,
+    tokenBalanceLoading,
+    tokenBalanceError,
+    mintNft,
+    tokenIds,
+    isMintPending,
+    isMintConfirming,
+    isBurnPending,
+    isBurnConfirming,
+    burnNft,
+  } = usePortfolio({
+    onMintSuccess: () => showToast(toast, 'NFT mint successful!', 'success'),
+    onBurnSuccess: () => showToast(toast, 'Token burn successful!', 'success'),
+    onMintError: (error) => handleError(toast, error),
+    onBurnError: (error) => handleError(toast, error),
   });
-
-  const mintCallback = (tokenId: number) => addTokenId(tokenId);
-
-  const burnCallback = (tokenId: number) => {
-    removeTokenId(tokenId);
-    refetchBalance();
-  };
-
-  const handleBurnToken = () => {
-    if (tokenIds.length > 0) {
-      const tokenId = tokenIds[tokenIds.length - 1];
-      burnNFT(tokenId, burnCallback);
-    }
-  };
 
   return (
     <Flex
@@ -79,15 +84,15 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
         gap={2}
       >
         <Text color="gray.500">Your Balance</Text>
-        <Skeleton isLoaded={!isLoading} height="40px" width="150px">
-          {isError ? (
+        <Skeleton isLoaded={!tokenBalanceLoading} height="40px" width="150px">
+          {tokenBalanceError && !tokenBalanceLoading && (
             <Text color="red.500" textAlign="center" fontSize="sm">
               Error fetching balance
             </Text>
-          ) : (
+          )}
+          {tokenBalance && (
             <Heading color="black" as="h5" size="md" textAlign="center">
-              {formatBalance(balance as ethers.BigNumberish)}{' '}
-              {polygonAmoyTestnet.nativeCurrency.symbol}
+              {formatBalance(tokenBalance)}
             </Heading>
           )}
         </Skeleton>
@@ -99,10 +104,10 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
             rounded="3xl"
             leftIcon={<MdOutlineCreateNewFolder />}
             iconSpacing={1}
-            onClick={() => mintNFT(mintCallback)}
-            isDisabled={!isTwoCompleted || mintLoading}
-            isLoading={mintLoading}
-            loadingText="Minting..."
+            onClick={mintNft}
+            isDisabled={!isTwoCompleted || isMintPending || isMintConfirming}
+            isLoading={isMintPending || isMintConfirming}
+            loadingText="Minting"
           >
             Mint NFT
           </Button>
@@ -112,9 +117,11 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
             leftIcon={<GiBurningBlobs />}
             iconSpacing={1}
             variant="outline"
-            isLoading={burnLoading}
-            isDisabled={burnLoading || Boolean(!tokenIds.length)}
-            onClick={handleBurnToken}
+            isLoading={isBurnPending || isBurnConfirming}
+            isDisabled={
+              isBurnConfirming || isBurnPending || Boolean(!tokenIds.length)
+            }
+            onClick={burnNft}
             loadingText="Burning..."
           >
             Burn NFT

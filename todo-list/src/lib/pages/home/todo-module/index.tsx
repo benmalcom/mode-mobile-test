@@ -47,7 +47,7 @@ export const TodoModule: React.FC = () => {
       <Portfolio isTwoCompleted={isTwoCompleted} />
       <Stack spacing={4} flex={1} h="fit-content">
         <Heading as="h3" size="xl" fontWeight={500} color="purple.900">
-          Todo List
+          Task Manager
         </Heading>
         <TodoActions
           onCreate={createTodo}
