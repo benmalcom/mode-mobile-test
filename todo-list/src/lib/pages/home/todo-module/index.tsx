@@ -43,9 +43,22 @@ export const TodoModule: React.FC = () => {
   };
 
   return (
-    <Flex h="full" gap={10} w="1180px" mx="auto" mt={28}>
+    <Flex
+      h="full"
+      gap={10}
+      w="full"
+      mx="auto"
+      mt={28}
+      flexDir={{ base: 'column', lg: 'row' }}
+    >
       <Portfolio isTwoCompleted={isTwoCompleted} />
-      <Stack spacing={4} flex={1} h="fit-content">
+      <Stack
+        spacing={4}
+        flex={1}
+        h="fit-content"
+        w={{ base: '95%', lg: 'unset' }}
+        mx={{ base: 'auto', lg: 'unset' }}
+      >
         <Heading as="h3" size="xl" fontWeight={500} color="purple.900">
           Task Manager
         </Heading>

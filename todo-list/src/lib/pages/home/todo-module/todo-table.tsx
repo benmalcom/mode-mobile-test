@@ -92,7 +92,7 @@ export const TodoTable: React.FC<TableProps> = ({
 }) => {
   const handleFetchMore = () => fetchMoreTodos();
   return (
-    <TableContainer bg="white" boxShadow="md">
+    <TableContainer bg="white" boxShadow="md" overflow="auto">
       <Table size="md" variant="simple">
         {!loading && todos.length === 0 && (
           <TableCaption>

@@ -24,7 +24,7 @@ export const Layout = ({ children }: LayoutProps) => {
       bg={bgColor} // Apply conditional bg color
     >
       <NavBar />
-      <Box flex={1} w="1180px" mx="auto">
+      <Box flex={1} w={{ base: 'full', lg: '1180px' }} mx="auto">
         {children}
       </Box>
     </Flex>

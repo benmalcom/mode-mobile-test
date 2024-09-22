@@ -66,8 +66,10 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
       flexDir="column"
       position="sticky"
       zIndex={5}
-      marginTop="80px"
+      marginTop={{ base: '10px', md: '50px', lg: '80px' }}
       gap={6}
+      w={{ base: '95%', md: '250px' }}
+      mx={{ base: 'auto', md: '2.5%' }}
     >
       <Flex
         flexDir="column"
@@ -75,7 +77,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
         justify="center"
         boxSizing="border-box"
         p={4}
-        w="250px"
+        w="full"
         h="fit-content"
         rounded="md"
         border="3px dashed"
@@ -108,6 +110,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
             isDisabled={!isTwoCompleted || isMintPending || isMintConfirming}
             isLoading={isMintPending || isMintConfirming}
             loadingText="Minting"
+            px={{ base: 9, md: 4 }}
           >
             Mint NFT
           </Button>
@@ -123,6 +126,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
             }
             onClick={burnNft}
             loadingText="Burning..."
+            px={{ base: 9, md: 4 }}
           >
             Burn NFT
           </Button>
