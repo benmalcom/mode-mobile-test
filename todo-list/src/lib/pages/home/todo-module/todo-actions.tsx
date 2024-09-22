@@ -11,12 +11,6 @@ import type { ChangeEvent } from 'react';
 
 import { ModalManager } from '~/lib/pages/home/todo-module/add-edit-modal';
 
-const triggerButton = ({ trigger }: { trigger(): void }) => (
-  <Button size="sm" colorScheme="purple" rounded="2xl" onClick={trigger}>
-    New Task
-  </Button>
-);
-
 type TodoActionsProps = {
   onCreate(values: Record<string, unknown>, callback?: () => void): void;
   isCreating?: boolean;
@@ -44,7 +38,7 @@ export const TodoActions: React.FC<TodoActionsProps> = ({
         </InputLeftElement>
         <Input
           type="search"
-          placeholder="Search todo item"
+          placeholder="Search task by title"
           rounded="2xl"
           colorScheme="purple"
           bg="gray.50" // Gray background by default

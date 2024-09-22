@@ -20,7 +20,6 @@ export const WalletConnector: React.FC = () => {
   const { connect, isConnecting, errorMessage, clearError } = useWeb3Auth();
 
   const handleConnect = () => connect();
-
   return (
     <Flex w="full" h="full" align="center" justify="center">
       <Flex
@@ -33,9 +32,14 @@ export const WalletConnector: React.FC = () => {
         align="center"
       >
         <Heading as="h4" size="2xl" color="purple.900" textAlign="center">
-          Your Web3 Task Manager
+          Your Task Manager
         </Heading>
-        <Text fontSize="15px" color="gray.600" opacity={0.8} textAlign="center">
+        <Text
+          fontSize={{ base: '18px', md: '16px' }}
+          color="gray.600"
+          opacity={0.8}
+          textAlign="center"
+        >
           {' '}
           Manage your tasks efficiently while keeping track of your crypto
           assets all in one place. Log in with your MetaMask wallet to view your
@@ -47,7 +51,11 @@ export const WalletConnector: React.FC = () => {
             <AlertIcon />
             <Box>
               <AlertTitle>Connect error!</AlertTitle>
-              <AlertDescription>{errorMessage}</AlertDescription>
+              <AlertDescription>
+                {errorMessage.includes('Connector already connected')
+                  ? 'Problem connecting your wallet, please try again or refresh your browser and try again.'
+                  : errorMessage}
+              </AlertDescription>
             </Box>
 
             <CloseButton

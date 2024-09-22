@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 
-// localStorage key
+// Define the localStorage key
 const STORAGE_KEY = 'TokenOwnership';
 
+// Define a TokenOwnershipRecord interface
 interface TokenOwnershipRecord {
   address: string;
   tokenIds: number[];
@@ -19,50 +20,64 @@ const setStoredData = (data: Record<string, TokenOwnershipRecord>) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 };
 
+// useTokenStorage hook
 export const useTokenStorage = (address: string) => {
   const [tokenIds, setTokenIds] = useState<number[]>([]);
 
+  // Memoize the current token data for the address
+  const storedData = useMemo(getStoredData, []);
+  const currentRecord = useMemo(
+    () => storedData[address] || { address, tokenIds: [] },
+    [storedData, address]
+  );
+
+  // Load token IDs from localStorage on component mount or address change
   useEffect(() => {
-    // Load token IDs from localStorage on component mount
-    const storedData = getStoredData();
-    const record = storedData[address];
-    if (record) {
-      setTokenIds(record.tokenIds);
-    }
-  }, [address]);
+    setTokenIds(currentRecord.tokenIds);
+  }, [currentRecord]);
 
-  // Add token ID to the storage
-  const addTokenId = (tokenId: number): void => {
-    const storedData = getStoredData();
-    const record = storedData[address] || { address, tokenIds: [] };
+  // Helper function to update the token IDs both locally and in localStorage
+  const updateTokenStorage = useCallback(
+    (newTokenIds: number[]) => {
+      const updatedRecord = { ...currentRecord, tokenIds: newTokenIds };
+      const updatedData = { ...storedData, [address]: updatedRecord };
 
-    if (!record.tokenIds.includes(tokenId)) {
-      record.tokenIds.push(tokenId);
-      storedData[address] = record;
-      setStoredData(storedData);
-      setTokenIds(record.tokenIds); // Update state
-    }
+      setTokenIds(newTokenIds);
+      setStoredData(updatedData);
+    },
+    [address, currentRecord, storedData]
+  );
+
+  // Add token ID to storage
+  const addTokenId = useCallback(
+    (tokenId: number) => {
+      if (!tokenIds.includes(tokenId)) {
+        const newTokenIds = [...tokenIds, tokenId];
+        updateTokenStorage(newTokenIds);
+      }
+    },
+    [tokenIds, updateTokenStorage]
+  );
+
+  // Remove token ID from storage
+  const removeTokenId = useCallback(
+    (tokenId: number) => {
+      const newTokenIds = tokenIds.filter((id) => id !== tokenId);
+      updateTokenStorage(newTokenIds);
+    },
+    [tokenIds, updateTokenStorage]
+  );
+
+  // Get token IDs associated with the address
+  const getTokenIdsByAddress = useCallback(
+    () => currentRecord.tokenIds,
+    [currentRecord]
+  );
+
+  return {
+    tokenIds,
+    addTokenId,
+    removeTokenId,
+    getTokenIdsByAddress,
   };
-
-  // Remove token ID from the storage
-  const removeTokenId = (tokenId: number): void => {
-    const storedData = getStoredData();
-    const record = storedData[address];
-
-    if (record) {
-      record.tokenIds = record.tokenIds.filter((id) => id !== tokenId);
-      storedData[address] = record;
-      setStoredData(storedData);
-      setTokenIds(record.tokenIds); // Update state
-    }
-  };
-
-  // Get all token IDs associated with the address
-  const getTokenIdsByAddress = (): number[] => {
-    const storedData = getStoredData();
-    const record = storedData[address];
-    return record ? record.tokenIds : [];
-  };
-
-  return { tokenIds, addTokenId, removeTokenId, getTokenIdsByAddress };
 };

@@ -9,7 +9,13 @@ import {
 } from 'react';
 import type { ReactNode } from 'react';
 import type { Connector } from 'wagmi';
-import { useAccount, useConnect, useDisconnect, useSignMessage } from 'wagmi';
+import {
+  useConfig,
+  useAccount,
+  useConnect,
+  useDisconnect,
+  useSignMessage,
+} from 'wagmi';
 
 import { useDefaultChain } from '~/lib/hooks/useDefaultChain';
 import { formatConnectErrors } from '~/lib/utils/error';
@@ -34,15 +40,17 @@ const MESSAGE_VERIFIED_KEY = 'messageVerified';
 
 export function Web3AuthProvider({ children }: { children: ReactNode }) {
   useDefaultChain();
+  const { state } = useConfig();
   const { isConnected, address } = useAccount();
   const { connect, connectors, error, isPending } = useConnect();
   const { disconnect } = useDisconnect();
   const { signMessageAsync } = useSignMessage();
+
   const [isMessageVerified, setIsMessageVerified] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem(MESSAGE_VERIFIED_KEY) === 'true';
-    }
-    return false;
+    return (
+      typeof window !== 'undefined' &&
+      localStorage.getItem(MESSAGE_VERIFIED_KEY) === 'true'
+    );
   });
 
   const [isSigningMessage, setIsSigningMessage] = useState(false);
@@ -54,17 +62,14 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
     []
   );
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  useEffect(() => setIsClient(true), []);
 
-  // Update handleSignMessage
   const handleMessageSignAndVerify = useCallback(async () => {
     setIsSigningMessage(true);
-    if (!isConnected) throw new Error('Wallet not connected.');
-
-    if (!address) {
-      throw new Error('Address not available, skipping message signing.');
+    if (!isConnected || !address) {
+      setErrorMessage('Wallet not connected or address missing.');
+      disconnect();
+      return;
     }
     try {
       await signAndVerifyMessage(signMessageAsync, address, message);
@@ -84,10 +89,8 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isConnected) {
       setIsMessageVerified(false);
-      // Sometimes isConnected can be false but MetaMask is still connected, disconnect again
-      disconnect();
     }
-  }, [isConnected, disconnect]);
+  }, [isConnected]);
 
   useEffect(() => {
     localStorage.setItem(MESSAGE_VERIFIED_KEY, String(isMessageVerified));
@@ -108,26 +111,31 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [error]);
 
-  const clearError = useCallback(() => {
-    setErrorMessage(null);
-  }, []);
+  const clearError = useCallback(() => setErrorMessage(null), []);
 
   const handleConnect = useCallback(() => {
+    disconnect();
     clearError();
-    if (isPending || isConnected) {
-      return; // Prevent multiple connection requests
-    }
-    // Find the MetaMask connector by name or id
+    if (isPending || isConnected) return;
+
     const metaMaskConnector = connectors.find(
       (connector) => connector.name === 'MetaMask'
     );
-
     if (!metaMaskConnector) {
-      console.error('MetaMask not found');
+      setErrorMessage('MetaMask not found');
       return;
     }
-    connect({ connector: metaMaskConnector });
-  }, [clearError, connect, connectors, isConnected, isPending]);
+    connect({
+      connector: metaMaskConnector,
+    });
+  }, [clearError, connect, connectors, disconnect, isConnected, isPending]);
+
+  useEffect(() => {
+    // The config state from wagmi holds on to connection data even after disconnect,  we need to disconnect it for total reset
+    if (state.current && state.status === 'disconnected') {
+      disconnect();
+    }
+  }, [disconnect, state]);
 
   const handleDisconnect = useCallback(() => {
     disconnect();
@@ -138,9 +146,9 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
       connect: handleConnect,
       disconnect: handleDisconnect,
       isConnected: isConnected && isMessageVerified,
+      isConnecting: isPending || isSigningMessage,
       error,
       connectors,
-      isConnecting: isPending || isSigningMessage,
       errorMessage,
       clearError,
     }),
@@ -149,15 +157,17 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
       handleDisconnect,
       isConnected,
       isMessageVerified,
-      error,
-      connectors,
       isPending,
       isSigningMessage,
+      error,
+      connectors,
       errorMessage,
       clearError,
     ]
   );
+
   if (!isClient) return null;
+
   return (
     <Web3AuthContext.Provider value={value}>
       {children}
@@ -167,8 +177,7 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
 
 export function useWeb3Auth() {
   const context = useContext(Web3AuthContext);
-  if (context === undefined) {
+  if (!context)
     throw new Error('useWeb3Auth must be used within a Web3AuthProvider');
-  }
   return context;
 }

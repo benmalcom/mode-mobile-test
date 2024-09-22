@@ -1,8 +1,8 @@
-import { defineChain } from 'viem';
-import { http, createConfig } from 'wagmi';
-import { metaMask } from 'wagmi/connectors';
-
 // Define Polygon Amoy Testnet
+
+import { defineChain } from 'viem';
+import { http, createConfig, cookieStorage, createStorage } from 'wagmi';
+import { metaMask } from 'wagmi/connectors';
 
 export const polygonRPCUrl = 'https://rpc-amoy.polygon.technology';
 
@@ -16,12 +16,8 @@ export const polygonAmoyTestnet = defineChain({
     symbol: 'MATIC',
   },
   rpcUrls: {
-    default: {
-      http: [polygonRPCUrl],
-    },
-    public: {
-      http: [polygonRPCUrl],
-    },
+    default: { http: [polygonRPCUrl] },
+    public: { http: [polygonRPCUrl] },
   },
   blockExplorers: {
     default: { name: 'PolygonScan', url: 'https://amoy.polygonscan.com' },
@@ -34,6 +30,10 @@ const projectId = '457751f94c56c29d849a484620dcb62c';
 export const config = createConfig({
   chains: [polygonAmoyTestnet],
   connectors: [metaMask()],
+  ssr: true,
+  storage: createStorage({
+    storage: cookieStorage,
+  }),
   transports: {
     [polygonAmoyTestnet.id]: http(polygonRPCUrl),
   },

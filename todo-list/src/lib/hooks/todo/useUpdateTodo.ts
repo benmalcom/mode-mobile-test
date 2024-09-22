@@ -2,7 +2,7 @@ import { useToast } from '@chakra-ui/react';
 import type React from 'react';
 import { useState } from 'react';
 
-import { updateToDo } from '~/lib/services/todo';
+import { updateToDo as updateToDoService } from '~/lib/services/todo';
 import type { Todo } from '~/lib/types/todo';
 
 interface UseUpdateTodoReturn {
@@ -29,7 +29,7 @@ export const useUpdateTodo = (
   ) => {
     setUpdating((prev) => new Set(prev).add(todoId));
     try {
-      const updated = await updateToDo(todoId, updatedTodo);
+      const updated = await updateToDoService(todoId, updatedTodo);
       setTodos(
         (prevTodos) =>
           prevTodos.map((todo) => (todo.id === todoId ? updated : todo)) // Replace the updated todo

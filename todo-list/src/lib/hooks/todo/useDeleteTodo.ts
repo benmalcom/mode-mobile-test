@@ -2,7 +2,7 @@ import { useToast } from '@chakra-ui/react';
 import type React from 'react';
 import { useState } from 'react';
 
-import { deleteToDo } from '~/lib/services/todo';
+import { deleteToDo as deleteToDoService } from '~/lib/services/todo';
 import type { Todo } from '~/lib/types/todo';
 
 interface UseDeleteTodoReturn {
@@ -27,7 +27,7 @@ export const useDeleteTodo = ({
   const deleteTodo = async (todoId: string, callback?: () => void) => {
     setDeleting((prev) => new Set(prev).add(todoId));
     try {
-      await deleteToDo(todoId);
+      await deleteToDoService(todoId);
       setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== todoId)); // Remove the deleted todo
       updatePaginationOnChange('delete');
       callback?.();

@@ -33,10 +33,8 @@ const handleError = (
   toast: ReturnType<typeof useToast>,
   error: Error | unknown
 ) => {
-  const message =
-    error instanceof Error
-      ? error.message
-      : 'An error occurred, please refresh browser and try again';
+  console.log('Error:', error);
+  const message = 'An error occurred, please refresh browser and try again';
   showToast(toast, message, 'error', 10000);
 };
 
