@@ -20,7 +20,6 @@ interface Web3AuthContextType {
   disconnect: () => void;
   isConnected: boolean;
   isConnecting: boolean;
-  address: string | undefined;
   error: Error | null;
   connectors: readonly Connector[];
   errorMessage: string | null;
@@ -35,7 +34,7 @@ const MESSAGE_VERIFIED_KEY = 'messageVerified';
 
 export function Web3AuthProvider({ children }: { children: ReactNode }) {
   useDefaultChain();
-  const { address, isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const { connect, connectors, error, isPending } = useConnect();
   const { disconnect } = useDisconnect();
   const { signMessageAsync } = useSignMessage();
@@ -139,7 +138,6 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
       connect: handleConnect,
       disconnect: handleDisconnect,
       isConnected: isConnected && isMessageVerified,
-      address,
       error,
       connectors,
       isConnecting: isPending || isSigningMessage,
@@ -151,7 +149,6 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
       handleDisconnect,
       isConnected,
       isMessageVerified,
-      address,
       error,
       connectors,
       isPending,
