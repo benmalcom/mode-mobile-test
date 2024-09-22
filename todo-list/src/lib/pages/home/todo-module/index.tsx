@@ -18,10 +18,17 @@ export const TodoModule: React.FC = () => {
     loading: isFetching,
     setTodos,
     fetchMoreTodos,
+    updatePaginationOnChange,
   } = useFetchTodos();
-  const { createTodo, isCreating } = useCreateTodo(setTodos);
+  const { createTodo, isCreating } = useCreateTodo({
+    setTodos,
+    updatePaginationOnChange,
+  });
   const { updateTodo, updating } = useUpdateTodo(setTodos);
-  const { deleteTodo, deleting } = useDeleteTodo(setTodos);
+  const { deleteTodo, deleting } = useDeleteTodo({
+    setTodos,
+    updatePaginationOnChange,
+  });
   const [searchTerm, setSearchTerm] = useState<string>(''); // State for search term
 
   const isTwoCompleted = useMemo(() => {

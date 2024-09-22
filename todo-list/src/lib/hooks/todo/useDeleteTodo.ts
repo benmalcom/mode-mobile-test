@@ -11,9 +11,15 @@ interface UseDeleteTodoReturn {
   error: string | null;
 }
 
-export const useDeleteTodo = (
-  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>
-): UseDeleteTodoReturn => {
+type UseDeleteTodoParams = {
+  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+  updatePaginationOnChange(action: 'create' | 'delete'): void;
+};
+
+export const useDeleteTodo = ({
+  setTodos,
+  updatePaginationOnChange,
+}: UseDeleteTodoParams): UseDeleteTodoReturn => {
   const [deleting, setDeleting] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
@@ -23,6 +29,7 @@ export const useDeleteTodo = (
     try {
       await deleteToDo(todoId);
       setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== todoId)); // Remove the deleted todo
+      updatePaginationOnChange('delete');
       callback?.();
       toast({
         description: 'Todo deleted successfully.',

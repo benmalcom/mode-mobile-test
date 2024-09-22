@@ -14,9 +14,15 @@ interface UseCreateTodoReturn {
   error: string | null;
 }
 
-export const useCreateTodo = (
-  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>
-): UseCreateTodoReturn => {
+type UseCreateTodoParams = {
+  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+  updatePaginationOnChange(action: 'create' | 'delete'): void;
+};
+
+export const useCreateTodo = ({
+  setTodos,
+  updatePaginationOnChange,
+}: UseCreateTodoParams): UseCreateTodoReturn => {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
@@ -29,6 +35,7 @@ export const useCreateTodo = (
     try {
       const newTodo = await createToDo(values as Omit<Todo, 'id'>);
       setTodos((prevTodos) => [...prevTodos, newTodo]); // Add the new todo to the array
+      updatePaginationOnChange('create');
       callback?.();
       toast({
         description: 'Todo created successfully.',

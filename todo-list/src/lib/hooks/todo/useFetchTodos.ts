@@ -18,6 +18,7 @@ interface UseFetchTodosReturn {
   loading: boolean;
   error: string | null;
   fetchMoreTodos: () => void; // Add the fetchMoreTodos function to return type
+  updatePaginationOnChange: (action: 'create' | 'delete') => void; // Add the fetchMoreTodos function to return type
 }
 
 export const useFetchTodos = (): UseFetchTodosReturn => {
@@ -56,6 +57,24 @@ export const useFetchTodos = (): UseFetchTodosReturn => {
     }
   };
 
+  // Update pagination when  a new item is created
+  const updatePaginationOnChange = (action: 'create' | 'delete') => {
+    setTodosPagination((current) => {
+      let newTotal = current.total;
+
+      if (action === 'create') {
+        newTotal += 1;
+      } else if (action === 'delete') {
+        newTotal -= 1;
+      }
+
+      return {
+        ...current,
+        total: newTotal,
+      };
+    });
+  };
+
   return {
     todos,
     setTodos, // Expose setTodos so that other hooks can update the state
@@ -63,5 +82,6 @@ export const useFetchTodos = (): UseFetchTodosReturn => {
     loading,
     error,
     fetchMoreTodos, // Export fetchMoreTodos for loading more
+    updatePaginationOnChange,
   };
 };

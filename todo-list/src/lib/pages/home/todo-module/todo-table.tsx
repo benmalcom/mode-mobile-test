@@ -92,7 +92,13 @@ export const TodoTable: React.FC<TableProps> = ({
 }) => {
   const handleFetchMore = () => fetchMoreTodos();
   return (
-    <TableContainer bg="white" boxShadow="md" overflow="auto">
+    <TableContainer
+      bg="white"
+      boxShadow="md"
+      overflow="auto"
+      maxHeight="700px"
+      overflowY="auto"
+    >
       <Table size="md" variant="simple">
         {!loading && todos.length === 0 && (
           <TableCaption>
@@ -231,7 +237,7 @@ export const TodoTable: React.FC<TableProps> = ({
           <Tfoot>
             <Tr>
               <Td colSpan={5}>
-                <Flex justify="space-between" align="center" mt={4}>
+                <Flex justify="space-between" align="center" mt={2}>
                   <Text fontSize="sm" color="gray.600">
                     Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
                     {Math.min(
