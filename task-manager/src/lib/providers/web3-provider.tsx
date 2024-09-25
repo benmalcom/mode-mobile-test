@@ -55,7 +55,6 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const handleConnect = useCallback(() => {
-    disconnect();
     clearError();
     if (isPending || isConnected) return;
 
@@ -71,7 +70,6 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
     clearError,
     connect,
     connectors,
-    disconnect,
     isConnected,
     isPending,
     setErrorMessage,

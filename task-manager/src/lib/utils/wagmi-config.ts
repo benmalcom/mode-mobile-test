@@ -2,7 +2,7 @@
 
 import { defineChain } from 'viem';
 import { http, createConfig, cookieStorage, createStorage } from 'wagmi';
-import { metaMask } from 'wagmi/connectors';
+import { metaMask } from 'wagmi/connectors'; // Import WalletConnect
 
 export const polygonRPCUrl = 'https://rpc-amoy.polygon.technology';
 
@@ -24,8 +24,6 @@ export const polygonAmoyTestnet = defineChain({
   },
   testnet: true,
 });
-
-// const projectId = '457751f94c56c29d849a484620dcb62c';
 
 export const config = createConfig({
   chains: [polygonAmoyTestnet],
