@@ -52,6 +52,11 @@ export const TodoModule: React.FC = () => {
     setSearchTerm(e.target.value);
   }, []);
 
+  const hasSearchCriteria = useMemo(
+    () => searchTerm.length > 0,
+    [searchTerm.length]
+  );
+
   return (
     <Flex
       h="full"
@@ -86,6 +91,7 @@ export const TodoModule: React.FC = () => {
           deleting={deleting}
           pagination={todosPagination}
           fetchMoreTodos={fetchMoreTodos}
+          hasSearchCriteria={hasSearchCriteria}
         />
       </Stack>
     </Flex>

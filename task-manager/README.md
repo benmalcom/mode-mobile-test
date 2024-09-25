@@ -1,3 +1,5 @@
+# Next.js Home Assignment Solution (Task Manager)
+
 ## Pre-requisites
 
 - [Node.js](https://nodejs.org/) or [nvm](https://github.com/nvm-sh/nvm) installed.

@@ -48,6 +48,7 @@ type TableProps = {
   onUpdate(todoId: string, updatedTodo: Todo, callback?: () => void): void;
   onDelete(todoId: string): void;
   fetchMoreTodos: () => void;
+  hasSearchCriteria?: boolean;
 };
 
 export const TodoTable: React.FC<TableProps> = ({
@@ -59,6 +60,7 @@ export const TodoTable: React.FC<TableProps> = ({
   deleting,
   loading,
   fetchMoreTodos,
+  hasSearchCriteria,
 }) => {
   return (
     <TableContainer bg="white" boxShadow="md" overflow="auto" maxHeight="700px">
@@ -66,8 +68,9 @@ export const TodoTable: React.FC<TableProps> = ({
         {!loading && todos.length === 0 && (
           <TableCaption>
             <Highlight query="New Task" styles={{ color: 'purple.500' }}>
-              You currently don&apos;t have any task, use the New Task button to
-              create one.
+              {hasSearchCriteria
+                ? 'No result returned for your search'
+                : 'You currently don&apos;t have any task, use the New Task button to create one.'}
             </Highlight>
           </TableCaption>
         )}

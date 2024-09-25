@@ -1,4 +1,4 @@
-# Next.js Home Assignement Project Overview
+# Next.js Home Assignment Project Overview
 
 - **Objective:** Build a secure, blockchain-integrated to-do list web application using Next.js, TypeScript, and web3 technologies.
 - **Scope:** Demonstrate expertise in advanced Next.js techniques, focusing on server functions, server-side rendering (SSR), web3-based authentication, session management, and interaction with blockchain smart contracts.
@@ -14,6 +14,8 @@ make up-dev
 ```
 
 This will start the To Do list API in http://localhost:7979
+
+[Go to Assignment solution - The Task Manager App](./task-manager/README.md)
 
 [Go to ToDo API Documentation](./api/README.md)
 
