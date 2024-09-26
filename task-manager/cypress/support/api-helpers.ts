@@ -8,6 +8,8 @@ export const interceptUpdateTodo = () =>
   cy.intercept('PUT', `${apiUrl}/*`).as('updateTodo');
 export const interceptDeleteTodo = () =>
   cy.intercept('DELETE', `${apiUrl}/*`).as('deleteTodo');
+export const interceptGetTodos = () =>
+  cy.intercept('GET', apiUrl).as('getTodos');
 
 export const addTask = (title: string) => {
   interceptAddTodo();

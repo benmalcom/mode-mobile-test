@@ -11,6 +11,8 @@ export default defineConfig({
     testIsolation: false,
     setupNodeEvents(on, config) {
       synpressPlugins(on, config);
+      // eslint-disable-next-line @typescript-eslint/no-require-imports,global-require
+      require('cypress-terminal-report/src/installLogsPrinter')(on);
     },
     baseUrl: 'http://localhost:3000',
     supportFile: 'cypress/support/e2e.ts' /* 'cypress/support/support.ts' */,
