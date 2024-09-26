@@ -21,8 +21,8 @@
     "push-release": "git push --follow-tags origin main",
     "prepare": "husky",
     "install:chromium": "playwright install chromium",
-    "test:e2e": "env-cmd -f .env npx synpress run -cf cypress.config.ts",
-    "test": "jest"
+    "test": "env-cmd -f .env npx synpress run -cf cypress.config.ts",
+    "test:unit": "jest"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
