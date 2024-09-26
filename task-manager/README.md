@@ -1,5 +1,7 @@
 # Next.js Home Assignment Solution (Task Manager)
 
+This project aims to provide a streamlined and robust application that integrates Metamask for handling blockchain-based interactions, including minting and burning tokens on the Polygon Amoy testnet. In this project, I've employed industry-standard practices and incorporated thorough testing coverage to ensure both unit and end-to-end (e2e) functionalities.
+
 ## Pre-requisites
 
 - [Node.js](https://nodejs.org/) or [nvm](https://github.com/nvm-sh/nvm) installed.
@@ -51,23 +53,31 @@ Get free testnet tokens from Polygon Faucet by selecting the Amoy Testnet.
 [https://faucets.chain.link/polygon-amoy](https://faucets.chain.link/polygon-amoy) has some links to get some testnet tokens.
 
 
+### Testing
+
+Testing plays a crucial role in ensuring the stability and reliability of this project. I've included two layers of tests:
+
+- **Unit Tests**: Validates that individual functions and components work as expected.
+- **End-to-End (e2e) Tests**: Simulates user interactions, including connecting a Metamask wallet and performing token-related operations (minting and burning).
+
 ### Some decisions
 
 - **State Management**: Used React Context for minimal state management.
 - **LocalStorage**: Minted token IDs are stored in localStorage and hydrated to local state for token burning.
 - **User Session**: Synced isMessageVerified to localStorage upon successful signature to maintain user login status.
+- **E2e Tests**: Utilized Synpress, a promising web3 testing framework built on top of Cypress for the e2e testing.
+- **Unit Tests**: Utilized Jest and Testing library for the unit tests.
 
-### Moving Forward, concerning testing
+### Moving Forward
 
-Testing the Next.js 14 application with MetaMask integration posed several challenges, especially given time constraints:
 
-- **Automation Difficulty**: Automating MetaMask interactions (wallet connection, transaction signing) is challenging due to browser extension reliance.
-- **Security Restrictions**: Browser security measures (CORS, sandboxing) complicate testing.
-- **Asynchronous Transactions**: Blockchain transactions require waiting for confirmations, adding complexity.
-I explored Synpress and Dapperwright for testing MetaMask-based dApps, but both frameworks are unreliable. Synpress has issues detecting MetaMask popups, while Dapperwright struggles with simulating real-world blockchain behavior.
+While the test suite covers a wide range of cases, particularly around the core interactions with the blockchain, one challenge arises with the **end-to-end (e2e) testing**, particularly around **minting and burning tokens**.
 
-Due to time limitations and the immaturity of these tools, I always prioritize core functionality over comprehensive automated tests. 
-Full automation of MetaMask and blockchain interactions remains challenging with current testing frameworks.
+During e2e tests, after connecting the Metamask wallet, there’s a chance that the **generated wallet address** may **not have enough testnet tokens (Polygon Amoy)**, which can cause the minting and burning token operations to fail due to insufficient funds. This is currently a limitation in testing that could affect test reliability in the absence of adequate token funding.
+
+To mitigate this, **exploring an automated method to fund the generated address** with Polygon Amoy testnet tokens would be an excellent next step. This would ensure that all test cases, particularly those involving token minting and burning, proceed without issue.
+
+I look forward to discussing ways to implement this in a scalable manner and further improve the reliability of the test suite.
 
 ### Conclusion
 

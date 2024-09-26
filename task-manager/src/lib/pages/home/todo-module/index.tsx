@@ -48,9 +48,13 @@ export const TodoModule: React.FC = () => {
   }, [todos, searchTerm]);
 
   // Memoized search handler to avoid re-renders on child components
-  const handleSearch = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  }, []);
+  const handleSearch = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      if (!todos.length) return;
+      setSearchTerm(e.target.value);
+    },
+    [todos.length]
+  );
 
   const hasSearchCriteria = useMemo(
     () => searchTerm.length > 0,
