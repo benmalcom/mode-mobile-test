@@ -55,10 +55,9 @@ Get free testnet tokens from Polygon Faucet by selecting the Amoy Testnet.
 
 ### Testing
 
-Testing plays a crucial role in ensuring the stability and reliability of this project. I've included two layers of tests:
 
-- **Unit Tests**: Validates that individual functions and components work as expected.
-- **End-to-End (e2e) Tests**: Simulates user interactions, including connecting a Metamask wallet and performing token-related operations (minting and burning).
+- Run `pnpm test` for the e2e tests
+- Run `pnpm run test:unit` for the unit tests on hooks
 
 ### Some decisions
 
