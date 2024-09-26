@@ -64,7 +64,7 @@ export const TodoTable: React.FC<TableProps> = ({
 }) => {
   return (
     <TableContainer bg="white" boxShadow="md" overflow="auto" maxHeight="700px">
-      <Table size="md" variant="simple">
+      <Table size="md" variant="simple" id="taskTable">
         {!loading && todos.length === 0 && (
           <TableCaption>
             <Highlight query="New Task" styles={{ color: 'purple.500' }}>
