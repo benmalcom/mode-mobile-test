@@ -41,6 +41,7 @@ export const RowActions: React.FC<{
         border="1px solid"
         borderColor="gray.200"
         h={4}
+        className="rowDropdown"
       />
       <MenuList
         width={{ base: '150px' }}

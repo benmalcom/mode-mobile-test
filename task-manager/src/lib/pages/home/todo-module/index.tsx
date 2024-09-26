@@ -65,6 +65,7 @@ export const TodoModule: React.FC = () => {
       mx="auto"
       mt={28}
       flexDir={{ base: 'column', lg: 'row' }}
+      id="todoModule"
     >
       <Portfolio isTwoCompleted={isTwoCompleted} />
       <Stack

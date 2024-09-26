@@ -13,7 +13,8 @@
   "rules": {
     "@typescript-eslint/lines-between-class-members": "off",
     "@typescript-eslint/no-throw-literal": "off",
-    "import/no-extraneous-dependencies": "off"
+    "import/no-extraneous-dependencies": "off",
+    "sonarjs/no-duplicate-string": "off"
   },
   "ignorePatterns": ["next-sitemap.config.js"]
 }
