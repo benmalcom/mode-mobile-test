@@ -30,6 +30,7 @@
       }
     ],
     "strictNullChecks": true,
+    "types": ["jest", "node"] // Ensure "jest" is included here
   },
   "include": [
     "next-env.d.ts",
@@ -41,6 +42,7 @@
     "global.d.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "./cypress.config.ts"
   ]
 }
