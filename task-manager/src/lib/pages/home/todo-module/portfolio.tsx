@@ -92,7 +92,13 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
             </Text>
           )}
           {tokenBalance && (
-            <Heading color="black" as="h5" size="md" textAlign="center">
+            <Heading
+              color="black"
+              as="h5"
+              size="md"
+              textAlign="center"
+              id="tokenBalance"
+            >
               {formatBalance(tokenBalance)}
             </Heading>
           )}

@@ -70,7 +70,7 @@ export const TodoTable: React.FC<TableProps> = ({
             <Highlight query="New Task" styles={{ color: 'purple.500' }}>
               {hasSearchCriteria
                 ? 'No result returned for your search'
-                : 'You currently don&apos;t have any task, use the New Task button to create one.'}
+                : `You currently don't have any task, use the New Task button to create one.`}
             </Highlight>
           </TableCaption>
         )}
