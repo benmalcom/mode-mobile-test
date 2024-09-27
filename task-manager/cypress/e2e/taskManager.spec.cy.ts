@@ -8,7 +8,7 @@ import {
 describe('Task Manager Module', () => {
   const taskTitle = `My New Task ${Date.now()}`;
   const updatedTaskTitle = 'My Updated Task Title';
-  const tasksToDelete = [updatedTaskTitle];
+  const tasksToDelete: string[] = [];
 
   before(() => {
     cy.visit('/');
@@ -38,40 +38,53 @@ describe('Task Manager Module', () => {
   it('Ensure we have two completed tasks for minting/burning', () => {
     const checkIfMintEnabled = () => {
       const nftTask = `NFT Tasks ${Date.now()}`;
+
       cy.get('button:contains("Mint NFT")').then(($button) => {
         if ($button.is(':disabled')) {
-          // Button is disabled, handle this case or log it
-          console.log('Mint NFT button is disabled');
+          // Button is disabled, add a task and complete it
           tasksToDelete.push(nftTask);
           addTask(nftTask);
-          markTaskAsCompleted(nftTask, checkIfMintEnabled);
+          markTaskAsCompleted(nftTask, checkIfMintEnabled); // Recursively check
+        } else {
+          // Button is enabled, proceed with minting
+          cy.log('Mint NFT button is enabled');
         }
       });
     };
+
     checkIfMintEnabled();
   });
 
   it('Should mint/burn tokens after the completed tasks', () => {
     const rpcUrl = 'https://rpc-amoy.polygon.technology/';
+    cy.intercept('POST', rpcUrl).as('mintOrBurnNFT');
+
     const mintAndBurnTokens = () => {
-      cy.intercept('POST', rpcUrl).as('mintOrBurnNFT');
       // Click the Mint NFT button
-      cy.contains('Mint NFT').should('be.enabled').click();
+      cy.contains('button', 'Mint NFT').should('not.be.disabled').click();
       cy.contains('Minting').should('be.visible');
-      // Wait for all requests to the RPC endpoint to finish
-      cy.wait('@mintOrBurnNFT');
-      // Assert the success toast
+      cy.confirmMetamaskTransactionAndWaitForMining();
+
+      // Wait for the mint request to finish
+      cy.wait('@mintOrBurnNFT').its('response.statusCode').should('eq', 200);
+
+      // Assert success toast message
       cy.contains('NFT mint successful!').should('be.visible');
-      // Click on the Burn NFT button
-      cy.contains('Burn NFT').should('be.enabled').click();
-      cy.wait('@mintOrBurnNFT'); // Wait for the burn request to finish
+
+      // Click the Burn NFT button
+      cy.contains('button', 'Burn NFT').should('not.be.disabled').click();
+      cy.contains('Burning').should('be.visible');
+      cy.confirmMetamaskTransactionAndWaitForMining();
+
+      // Wait for the burn request to finish
+      cy.wait('@mintOrBurnNFT').its('response.statusCode').should('eq', 200);
     };
+
     mintAndBurnTokens();
   });
 
   it('Should delete used tasks', () => {
-    tasksToDelete.forEach((task) => {
-      deleteTask(task);
-    });
+    if (!tasksToDelete.length) return;
+    tasksToDelete.forEach((task) => deleteTask(task));
   });
 });

@@ -30,7 +30,7 @@
       }
     ],
     "strictNullChecks": true,
-    "types": ["jest", "node"] // Ensure "jest" is included here
+    "types": ["jest", "node", "cypress"] // Ensure "jest" is included here
   },
   "include": [
     "next-env.d.ts",
@@ -39,7 +39,8 @@
     "src",
     "commitlint.config.js",
     ".next/types/**/*.ts",
-    "global.d.ts"
+    "global.d.ts",
+    ".eslintrc.cjs"
   ],
   "exclude": [
     "node_modules",
