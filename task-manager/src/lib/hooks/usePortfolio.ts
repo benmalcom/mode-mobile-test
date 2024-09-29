@@ -1,11 +1,17 @@
 import { usePrevious } from '@chakra-ui/hooks';
-import type { GetBalanceReturnType, GetBalanceErrorType } from '@wagmi/core';
+import type {
+  GetBalanceReturnType,
+  GetBalanceErrorType,
+  EstimateGasErrorType,
+} from '@wagmi/core';
 import { useCallback, useEffect } from 'react';
+import { parseGwei } from 'viem';
 import {
   useWriteContract,
   useAccount,
   useBalance,
   useWaitForTransactionReceipt,
+  useEstimateGas,
 } from 'wagmi';
 
 import ERC721ContractAbi from '~/lib/data/ERC721-ABI.json';
@@ -16,6 +22,7 @@ import {
   NFT_CONTRACT_ADDRESS,
 } from '~/lib/utils/constants';
 import { extractTokenIdFromReceipt } from '~/lib/utils/token';
+import { polygonAmoyTestnet } from '~/lib/utils/wagmi-config';
 
 // Define the types for the return values
 interface UsePortfolioReturn {
@@ -31,6 +38,8 @@ interface UsePortfolioReturn {
   isBurnConfirming: boolean;
   mintError: Error | null;
   burnError: Error | null;
+  gasEstimateError: EstimateGasErrorType | null;
+  isGasEstimating: boolean;
 }
 
 // Define the types for the callback parameters
@@ -50,6 +59,16 @@ export const usePortfolio = ({
   const { address } = useAccount();
   const { addTokenId, removeTokenId, tokenIds, removeLastTokenId } =
     useTokenStorage(address!);
+
+  const {
+    data: gasEstimate,
+    isPending: isGasEstimating,
+    error: gasEstimateError,
+  } = useEstimateGas({
+    account: address,
+    to: NFT_CONTRACT_ADDRESS,
+    chainId: polygonAmoyTestnet.id,
+  });
 
   // Fetch balance
   const {
@@ -75,6 +94,8 @@ export const usePortfolio = ({
       address: NFT_CONTRACT_ADDRESS,
       abi: ERC721ContractAbi.abi,
       functionName: 'mint',
+      gas: 300000n, // Estimated gas limit
+      gasPrice: parseGwei('20'), // Set gas price to 20 Gwei,
     });
 
   // Burn NFT
@@ -95,6 +116,8 @@ export const usePortfolio = ({
       abi: ERC721ContractAbi.abi,
       functionName: 'burn',
       args: [tokenId],
+      gas: 300000n, // Estimated gas limit
+      gasPrice: parseGwei('20'), // Set gas price to 20 Gwei,
     });
   };
 
@@ -178,5 +201,7 @@ export const usePortfolio = ({
     isBurnConfirming,
     burnError,
     mintError,
+    gasEstimateError,
+    isGasEstimating,
   };
 };

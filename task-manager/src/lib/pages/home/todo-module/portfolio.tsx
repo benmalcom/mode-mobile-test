@@ -53,6 +53,8 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
     isBurnPending,
     isBurnConfirming,
     burnNft,
+    isGasEstimating,
+    gasEstimateError,
   } = usePortfolio({
     onMintSuccess: () => showToast(toast, 'NFT mint successful!', 'success'),
     onBurnSuccess: () => showToast(toast, 'Token burn successful!', 'success'),
@@ -142,6 +144,22 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
             {tokenIds.length}
           </Text>
         </Flex>
+        {!isGasEstimating && gasEstimateError && (
+          <Flex
+            h="fit-content"
+            bg="gray.50"
+            w="full"
+            align="center"
+            px={3}
+            py={2}
+            gap={1}
+          >
+            <Text color="red.600" fontSize="sm">
+              Error: You might experience problems executing mint/burn
+              transactions, as a result of on chains errors.
+            </Text>
+          </Flex>
+        )}
       </Stack>
     </Flex>
   );

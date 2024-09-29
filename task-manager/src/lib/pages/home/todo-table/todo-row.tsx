@@ -1,5 +1,5 @@
 import { Badge, Flex, Icon, Td, Text, Tr } from '@chakra-ui/react';
-import { format } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import type React from 'react';
 import { FaCircleCheck } from 'react-icons/fa6';
 
@@ -39,7 +39,11 @@ export const TodoRow: React.FC<{
           {fetchPriorityLabel(todo.priority)}
         </Badge>
       </Td>
-      <Td fontSize="sm">{format(new Date(todo.dueDate), 'MMM dd, yyyy')}</Td>
+      <Td fontSize="sm">
+        {isToday(new Date(todo.dueDate))
+          ? 'Today'
+          : format(new Date(todo.dueDate), 'MMM dd, yyyy')}
+      </Td>
       <Td>
         {todo.completed ? (
           <Flex align="center" gap={1}>
