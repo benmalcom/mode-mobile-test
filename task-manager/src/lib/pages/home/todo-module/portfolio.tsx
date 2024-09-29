@@ -114,7 +114,12 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
             leftIcon={<MdOutlineCreateNewFolder />}
             iconSpacing={1}
             onClick={mintNft}
-            isDisabled={!isTwoCompleted || isMintPending || isMintConfirming}
+            isDisabled={
+              !isTwoCompleted ||
+              isMintPending ||
+              isMintConfirming ||
+              isGasEstimating
+            }
             isLoading={isMintPending || isMintConfirming}
             loadingText="Minting"
             px={{ base: 9, md: 4 }}
@@ -154,7 +159,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ isTwoCompleted }) => {
             py={2}
             gap={1}
           >
-            <Text color="red.600" fontSize="sm">
+            <Text color="red.600" fontSize="xs">
               Error: You might experience problems executing mint/burn
               transactions, as a result of on chains errors.
             </Text>
